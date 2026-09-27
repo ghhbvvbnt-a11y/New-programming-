@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Not Programming</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--bg:#e6eaf0;--fg:#1c2230;--mut:#6b7385;--card:#f3f6fa;--bd:#d5dbe6;--a:#6d4aff;--a2:#2b9bff;--sh1:#c3cad8;--sh2:#fff;--in:#e6eaf0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+:root[data-theme="dark"]{--bg:#0b0d12;--fg:#eef1f7;--mut:#8b93a7;--card:#141822;--bd:#232937;--sh1:#07080c;--sh2:#1b202c;--in:#10131b}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:'Segoe UI',Tahoma,Arial,sans-serif;min-height:100vh;background-image:radial-gradient(var(--bd) 1px,transparent 1px);background-size:22px 22px}
+button,input,select{font-family:inherit;color:inherit}button{cursor:pointer}
+.g{background:linear-gradient(90deg,var(--a),var(--a2),#ffb020);-webkit-background-clip:text;background-clip:text;color:transparent}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;max-width:1000px;margin:auto}
+.brand{font-weight:800;font-size:17px;display:flex;gap:10px;align-items:center}.lg{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px #6d4aff44}button.tb{display:inline-flex;align-items:center;gap:6px}.mono{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;font-family:ui-monospace,Menlo,monospace;color:#fff;background:linear-gradient(135deg,var(--a),var(--a2));margin-bottom:10px}[dir=rtl] .ar svg{transform:scaleX(-1)}.mq{direction:ltr}.dock em{font-style:normal}.dock button{position:relative}.dock{overflow-x:auto}.nt{position:absolute;top:2px;inset-inline-end:4px;background:#e0445a;color:#fff;border-radius:99px;font-size:10px;padding:1px 6px}
+textarea{width:100%;padding:11px;margin:5px 0 9px;border-radius:10px;border:1px solid var(--bd);background:var(--in);font-family:inherit;color:inherit;resize:vertical}
+.cvi{width:100%;height:130px;object-fit:cover;border-radius:14px;margin-bottom:12px;display:block}.cvi.wide{height:200px;border-radius:20px 20px 0 0;margin:0}.cvi.ph{display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--bd)}
+.ds{color:var(--mut);font-size:13px;line-height:1.7;margin:4px 0 8px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.av2{width:64px;height:64px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--a);border:1px solid var(--bd);flex:none}.av2 img,.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;padding:10px 2px;margin-bottom:10px}.chat.big{min-height:220px;max-height:52vh}.chat.sm{max-height:220px}
+.bub{max-width:88%;padding:10px 14px;border-radius:16px;background:var(--card);border:1px solid var(--bd);font-size:14px;line-height:1.7;align-self:flex-start;word-break:break-word}.bub.me{align-self:flex-end;background:var(--fg);color:var(--bg)}.bub small{display:block;opacity:.6;font-size:11px;margin-bottom:3px}
+.bub pre{background:#0b0d12;color:#e8ecf5;padding:12px;border-radius:12px;overflow-x:auto;margin:8px 0;font-size:13px;text-align:left}.bub code{font-family:ui-monospace,Menlo,monospace;font-size:13px}.bub :not(pre)>code{background:#7f7f7f33;padding:1px 6px;border-radius:6px}
+.rowin{display:flex;gap:8px;align-items:flex-end}.rowin textarea{margin:0;flex:1}.rowin .b{margin:0;height:46px}
+.pay{display:flex;gap:14px;flex-wrap:wrap;align-items:center}.th{width:84px;height:110px;object-fit:cover;border-radius:12px;border:1px solid var(--bd);cursor:zoom-in}.bk svg{transform:scaleX(-1)}[dir=rtl] .bk svg{transform:none}.brand small{display:block;font-weight:400;font-size:11px;color:var(--mut)}
+.tools{display:flex;gap:8px}
+.tb{border:1px solid var(--bd);background:var(--card);border-radius:12px;padding:8px 12px;font-size:13px}
+main{max-width:1000px;margin:auto;padding:8px 18px 120px}
+/* auth */
+.au{max-width:390px;margin:20px auto;background:var(--bg);border-radius:30px;padding:30px 26px;text-align:center;box-shadow:12px 12px 30px var(--sh1),-12px -12px 30px var(--sh2)}
+.ic{color:var(--a);width:64px;height:64px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:6px 6px 12px var(--sh1),-6px -6px 12px var(--sh2)}
+.au h2{margin:4px 0}.au p{margin:0 0 16px;color:var(--mut);font-size:13px}
+.au input,.au select{width:100%;padding:13px 16px;margin-bottom:13px;border:0;border-radius:14px;background:var(--in);box-shadow:inset 4px 4px 8px var(--sh1),inset -4px -4px 8px var(--sh2);outline:0;font-size:14px}
+.nb{width:100%;padding:14px;border:0;border-radius:14px;background:var(--bg);color:var(--a);font-weight:700;font-size:15px;box-shadow:5px 5px 10px var(--sh1),-5px -5px 10px var(--sh2)}
+.nb:active{box-shadow:inset 4px 4px 8px var(--sh1),inset -4px -4px 8px var(--sh2)}
+.lk{background:none;border:0;color:var(--a);margin-top:14px;font-size:13px}.er{color:#e0445a;font-size:13px;min-height:18px;margin-bottom:6px}
+/* hero */
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:center;padding:24px 0}
+.bdg{display:inline-block;font-size:12px;padding:5px 12px;border:1px solid var(--bd);border-radius:99px;background:var(--card);margin-bottom:14px}.bdg:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#2fd27a;margin-inline-end:8px}
+.hero h1{font-size:clamp(34px,7vw,56px);line-height:1.15;margin:0 0 12px;font-weight:800}
+.hero p{color:var(--mut);line-height:1.8;margin:0 0 20px}
+.bt{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:99px;padding:12px 24px;background:var(--fg);color:var(--bg);font-weight:700;font-size:14px;text-decoration:none}
+.bt.s{background:var(--card);color:var(--fg);border:1px solid var(--bd)}.bt.r{background:#e0445a22;color:#e0445a}
+.lan{display:flex;flex-direction:column;align-items:center;transform-origin:top center;animation:sw 5s ease-in-out infinite}
+@keyframes sw{0%,100%{transform:rotate(2.5deg)}50%{transform:rotate(-2.5deg)}}
+.lan:before{content:"";width:6px;height:70px;background:linear-gradient(var(--bd),var(--mut));border-radius:3px}
+.id{width:250px;border-radius:20px;overflow:hidden;background:var(--card);border:1px solid var(--bd);box-shadow:0 20px 40px #0004}
+.id .hd{height:92px;background:linear-gradient(135deg,#8a3dff,#ff5ea8,#ffa53d);display:flex;justify-content:center;align-items:flex-end}
+.id .av{color:var(--a);width:70px;height:70px;border-radius:50%;background:var(--card);border:4px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:-35px}
+.id .bd{padding:44px 16px 16px;text-align:center}.id b{font-size:17px}.id div small{display:block;color:var(--mut);margin-top:4px;font-size:12px}
+.bar{display:flex;justify-content:center;gap:2px;margin-top:14px;align-items:flex-end;height:24px}.bar i{width:3px;background:var(--fg);opacity:.7}
+.mq{overflow:hidden;border-block:1px solid var(--bd);margin:14px 0;padding:12px 0}.mq div{display:flex;gap:34px;width:max-content;animation:mq 22s linear infinite;color:var(--mut);font-weight:600}
+@keyframes mq{to{transform:translateX(-50%)}}
+h3.sec{font-size:24px;text-align:center;margin:34px 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.cd{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px}
+.cd:before{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));filter:blur(38px);opacity:0;inset-inline-end:-30px;top:-30px;transition:.4s}
+.cd:hover:before{opacity:.55}.cd>*{position:relative}.cd h4{margin:6px 0;font-size:16px}
+.tg{display:inline-block;font-size:11px;padding:3px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--bd);margin-inline-end:4px}
+.pr{font-weight:800;margin:10px 0;color:var(--a)}
+.b{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:11px;background:var(--fg);color:var(--bg);font-weight:700;font-size:14px;margin-top:8px}.b.s{background:var(--bg);color:var(--fg);border:1px solid var(--bd)}
+.ch{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.c{padding:7px 14px;border-radius:99px;border:1px solid var(--bd);background:var(--card);font-size:13px}.c.on{background:var(--fg);color:var(--bg)}
+.bx{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:18px;margin-bottom:14px}
+.bx input,.bx select,.md input,.md select{width:100%;padding:11px;margin:5px 0 9px;border-radius:10px;border:1px solid var(--bd);background:var(--in)}
+.rw{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14px;flex-wrap:wrap;align-items:center}
+.dock{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;gap:4px;padding:8px;border-radius:24px;background:var(--card);border:1px solid var(--bd);box-shadow:0 10px 30px #0004;z-index:10;max-width:96vw}
+.dock button,.dock a{border:0;background:none;text-decoration:none;font-size:11px;padding:8px 14px;border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mut)}
+.dock .on{background:var(--bg);color:var(--fg);box-shadow:inset 2px 2px 5px var(--sh1),inset -2px -2px 5px var(--sh2)}
+.ov{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.md{background:var(--card);border-radius:22px;padding:22px;width:100%;max-width:400px;max-height:90vh;overflow:auto}
+.pm{display:flex;gap:8px;margin:10px 0}.pm button{flex:1;padding:11px;border-radius:12px;border:1px solid var(--bd);background:none}.pm .on{border-color:var(--a);color:var(--a)}
+.nm{background:var(--bg);padding:12px;border-radius:10px;text-align:center;font-size:18px;direction:ltr;margin-bottom:10px;color:var(--a);font-weight:700}
+.ok{color:#2fd27a}.wt{color:#e5a70b}.no{color:#e0445a}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.dock button,.dock a{padding:8px 10px}}
+</style></head><body>
+<header><div class="brand"><span class="lg" id="logo"></span><span>Not <span class="g">Programming</span><small id="tag"></small></span></div>
+<div class="tools"><select class="tb" id="lg" onchange="setLang(this.value)"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option></select>
+<button class="tb" id="th" onclick="toggleTheme()" aria-label="theme"></button><button class="tb" id="lo" onclick="doLogout()" style="display:none"></button></div></header>
+<div id="gerr" style="display:none;max-width:1000px;margin:0 auto;padding:0 18px"></div>
+<main id="m"></main><div class="dock" id="dk" style="display:none"></div>
+<div class="ov" id="ov"><div class="md" id="md"></div></div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const L={
+ar:{tag:'منصة تعلّم البرمجة',open:'دخول الكورس',items:'عنصر',locked:'مقفل — اشترك لفتح الفيديوهات والامتحانات والملفات',back:'رجوع',video:'فيديو',exam:'امتحان',pdf:'ملف PDF',openPdf:'فتح الملف',startExam:'بدء الامتحان',noItems:'لا يوجد محتوى بعد',newC:'إنشاء كورس جديد',addItem:'إضافة محتوى للكورس (فيديو / امتحان / PDF)',itemTitle:'عنوان المحتوى',itemUrl:'الرابط (فيديو أو PDF أو رابط امتحان خارجي)',welcome:'أهلاً بك',lsub:'سجّل دخولك لتكمل رحلتك',email:'البريد الإلكتروني',pass:'كلمة المرور',login:'تسجيل الدخول',noacc:'ليس لديك حساب؟ أنشئ حساباً',create:'إنشاء حساب',csub:'ابدأ رحلتك معنا',name:'الاسم الكامل',mail:'البريد الإلكتروني',age:'السن',sp:'رقم الطالب',pp:'رقم ولي الأمر',pass2:'تأكيد كلمة المرور',hasacc:'لديك حساب؟ سجّل الدخول',e1:'املأ كل الحقول',e2:'بيانات الدخول غير صحيحة',e3:'كلمة المرور 6 أحرف على الأقل',e4:'كلمتا المرور غير متطابقتين',e5:'البريد مسجل بالفعل',e6:'بريد إلكتروني غير صحيح',
+g0:'تعليم حر',g1:'أولى ثانوي',g2:'ثانية ثانوي',all:'الكل',avail:'متاح للتدريس',hi:'أنا',role:'مبرمج ومعلّم',hp:'أعلّمك البرمجة بأسلوب عصري وسلس، من الصفر حتى الاحتراف، بأكثر من لغة برمجة.',browse:'تصفّح الكورسات',lang:'لغات البرمجة',courses:'كورس',
+home:'الرئيسية',cs:'الكورسات',pf:'ملفي',dash:'المعلم',help:'الدعم',out:'خروج',free:'مجاني',watch:'شاهد',pend:'قيد المراجعة',buy:'اشترِ الآن',egp:'ج.م',del:'حذف',none:'لا توجد عناصر',
+pay:'الدفع',vc:'فودافون كاش',ip:'إنستاباي',send:'حوّل المبلغ على:',proof:'ارفع صورة إشعار التحويل',conf:'تأكيد الدفع',cancel:'إلغاء',pfirst:'ارفع صورة الإشعار أولاً',sent:'تم الإرسال، سيتم التفعيل بعد المراجعة',
+info:'بياناتي',bought:'مشترياتي',reg:'تاريخ التسجيل',par:'ولي الأمر',grade:'السنة',active:'مفعّل',rej:'مرفوض',
+add:'إضافة فيديو / كورس',ct:'عنوان الكورس',price:'السعر (0 = مجاني)',url:'رابط الفيديو',publish:'نشر للطلاب',wal:'بيانات الدفع',wn:'رقم فودافون كاش',in:'عنوان إنستاباي',save:'حفظ',orders:'طلبات الدفع',ap:'تفعيل',rj:'رفض',studs:'الطلاب',badurl:'اكتب العنوان ورابطاً صحيحاً https://',logged:'مسجل'},
+en:{tag:'Learn to code',open:'Open course',items:'items',locked:'Locked — subscribe to unlock videos, exams and files',back:'Back',video:'Video',exam:'Exam',pdf:'PDF file',openPdf:'Open file',startExam:'Start exam',noItems:'No content yet',newC:'Create new course',addItem:'Add content to a course (video / exam / PDF)',itemTitle:'Content title',itemUrl:'Link (video, PDF or external exam link)',welcome:'Welcome',lsub:'Login to continue your journey',email:'Email address',pass:'Password',login:'Login',noacc:"Don't have an account? Sign up",create:'Create Account',csub:'Start your journey with us',name:'Full name',mail:'Email address',age:'Age',sp:'Student phone',pp:'Parent phone',pass2:'Confirm password',hasacc:'Have an account? Login',e1:'Fill in all fields',e2:'Wrong credentials',e3:'Password must be 6+ characters',e4:'Passwords do not match',e5:'Email already registered',e6:'Invalid email',
+g0:'Self-learning',g1:'Grade 10',g2:'Grade 11',all:'All',avail:'Available to teach',hi:"Hi, I'm",role:'Developer & Instructor',hp:'I teach programming the modern, smooth way — from zero to pro, across multiple languages.',browse:'Browse courses',lang:'Languages',courses:'courses',
+home:'Home',cs:'Courses',pf:'Profile',dash:'Teacher',help:'Support',out:'Logout',free:'Free',watch:'Watch',pend:'Under review',buy:'Buy now',egp:'EGP',del:'Delete',none:'Nothing here yet',
+pay:'Payment',vc:'Vodafone Cash',ip:'InstaPay',send:'Transfer the amount to:',proof:'Upload transfer receipt',conf:'Confirm payment',cancel:'Cancel',pfirst:'Upload the receipt first',sent:'Sent! Access is activated after review',
+info:'My info',bought:'My purchases',reg:'Joined',par:'Parent',grade:'Grade',active:'Active',rej:'Rejected',
+add:'Add video / course',ct:'Course title',price:'Price (0 = free)',url:'Video URL',publish:'Publish',wal:'Payment details',wn:'Vodafone Cash number',in:'InstaPay address',save:'Save',orders:'Payment requests',ap:'Approve',rj:'Reject',studs:'Students',badurl:'Enter a title and a valid https:// link',logged:'Registered'},
+fr:{tag:'Apprendre à coder',open:'Ouvrir le cours',items:'éléments',locked:'Verrouillé — abonnez-vous pour accéder aux vidéos, examens et fichiers',back:'Retour',video:'Vidéo',exam:'Examen',pdf:'Fichier PDF',openPdf:'Ouvrir le fichier',startExam:"Commencer l'examen",noItems:'Aucun contenu',newC:'Créer un cours',addItem:'Ajouter du contenu (vidéo / examen / PDF)',itemTitle:'Titre du contenu',itemUrl:'Lien (vidéo, PDF ou lien externe)',welcome:'Bienvenue',lsub:'Connectez-vous pour continuer',email:'Adresse e-mail',pass:'Mot de passe',login:'Connexion',noacc:'Pas de compte ? Inscrivez-vous',create:'Créer un compte',csub:'Commencez votre parcours',name:'Nom complet',mail:'Adresse e-mail',age:'Âge',sp:"Tél. de l'élève",pp:'Tél. du parent',pass2:'Confirmer le mot de passe',hasacc:'Déjà inscrit ? Connexion',e1:'Remplissez tous les champs',e2:'Identifiants incorrects',e3:'6 caractères minimum',e4:'Mots de passe différents',e5:'E-mail déjà utilisé',e6:'E-mail invalide',
+g0:'Libre',g1:'Seconde',g2:'Première',all:'Tous',avail:"Disponible pour enseigner",hi:'Je suis',role:'Développeur & formateur',hp:"J'enseigne la programmation de façon moderne et fluide, de zéro à pro, en plusieurs langages.",browse:'Voir les cours',lang:'Langages',courses:'cours',
+home:'Accueil',cs:'Cours',pf:'Profil',dash:'Prof',help:'Aide',out:'Quitter',free:'Gratuit',watch:'Regarder',pend:'En vérification',buy:'Acheter',egp:'EGP',del:'Suppr.',none:'Rien ici',
+pay:'Paiement',vc:'Vodafone Cash',ip:'InstaPay',send:'Transférez le montant à :',proof:'Envoyez le reçu',conf:'Confirmer',cancel:'Annuler',pfirst:"Ajoutez d'abord le reçu",sent:'Envoyé ! Activation après vérification',
+info:'Mes infos',bought:'Mes achats',reg:'Inscrit le',par:'Parent',grade:'Niveau',active:'Actif',rej:'Refusé',
+add:'Ajouter une vidéo / un cours',ct:'Titre du cours',price:'Prix (0 = gratuit)',url:'Lien vidéo',publish:'Publier',wal:'Paiement',wn:'Numéro Vodafone Cash',in:'Adresse InstaPay',save:'Enregistrer',orders:'Demandes de paiement',ap:'Valider',rj:'Refuser',studs:'Élèves',badurl:'Titre et lien https:// valide requis',logged:'Inscrit'}};
+const TR=[['Python','Py'],['JavaScript','JS'],['HTML/CSS','H5'],['C++','C+'],['Java','Jv'],['C#','C#']];
+const P={
+spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16v4M17 18h4"/>',
+life:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M6 6l3.5 3.5M18 6l-3.5 3.5M6 18l3.5-3.5M18 18l-3.5-3.5"/>',
+camera:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+send:'<path d="M4 12l16-8-6 16-2.5-6.5z"/>',
+check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+copy:'<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+mail:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/>',
+video:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/>',
+exam:'<rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3H9zM9 12l1.5 1.5L14 10M9 17h6"/>',
+pdf:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/>',
+home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M8 7h8M8 11h5"/>',
+id:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16.5c.6-1.5 1.9-2.2 3.2-2.2s2.6.7 3.2 2.2M15 9.5h3M15 13h3"/>',
+sliders:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+chat:'<path d="M4 5h16v11H9l-5 4z"/>',
+lock:'<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+userplus:'<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20c.6-3.5 3.2-5.5 6.5-5.5s5.9 2 6.5 5.5M19 8v6M16 11h6"/>',
+user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.7-4 3.6-6 7.5-6s6.8 2 7.5 6"/>',
+theme:'<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor"/>',
+out:'<path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+play:'<path d="M8 5.5v13l11-6.5z"/>',
+clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+code:'<path d="M9 4C6.5 4 7.5 9 5 12c2.5 3 1.5 8 4 8M15 4c2.5 0 1.5 5 4 8-2.5 3-1.5 8-4 8"/>'};
+const I=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
+/* extra translations added on top of the base dictionary */
+const N={
+ai:["المساعد الذكي","AI Assistant","Assistant IA"],aiT:["NP AI — مساعدك في البرمجة","NP AI — your coding mentor","NP AI — ton mentor de code"],
+aiS:["اسأل عن أي كود أو خطأ أو فكرة وهيشرحلك خطوة بخطوة.","Ask about any code, bug or idea — explained step by step.","Posez une question sur du code, un bug ou une idée."],
+aiP:["اكتب سؤالك أو الصق الكود هنا…","Type your question or paste code…","Écrivez votre question ou collez du code…"],
+q1:["اشرح لي الـ Loops ببساطة","Explain loops simply","Explique les boucles simplement"],q2:["ساعدني ألاقي الخطأ في كودي","Help me find the bug in my code","Aide-moi à trouver le bug"],q3:["اديني تمرين Python مع الحل","Give me a Python exercise with solution","Donne-moi un exercice Python corrigé"],
+aiErr:["المساعد غير متصل حالياً. لازم المعلم يضبط رابط خادم الذكاء الاصطناعي من الإعدادات.","The assistant is offline. The teacher must set the AI server URL in Settings.","L'assistant est hors ligne. L'enseignant doit définir l'URL du serveur IA dans les paramètres."],
+aiLim:["وصلت للحد اليومي (40 رسالة). كمّل بكرة.","Daily limit reached (40 messages). Come back tomorrow.","Limite quotidienne atteinte (40 messages)."],aiThink:["بيفكر…","Thinking…","Réflexion…"],
+buddy:["كلم صاحبك","Talk to your buddy","Parle à ton pote"],buddyS:["كلّم المعلم مباشرة — 3 رسائل في الأسبوع كحد أقصى.","Message your teacher directly — max 3 messages per week.","Écrivez à votre enseignant — 3 messages max par semaine."],
+left:["المتبقي هذا الأسبوع","Left this week","Restants cette semaine"],resets:["يتجدد كل سبت","Resets every Saturday","Renouvelé chaque samedi"],limit:["خلصت رسائل الأسبوع، جرّب السبت الجاي.","No messages left this week.","Plus de messages cette semaine."],
+msgP:["اكتب رسالتك…","Write your message…","Écrivez votre message…"],sendB:["إرسال","Send","Envoyer"],teacher:["المعلم","Teacher","Enseignant"],you:["أنت","You","Vous"],
+photo:["تغيير الصورة","Change photo","Changer la photo"],editInfo:["تعديل بياناتي","Edit my info","Modifier mes infos"],editNote:["التعديل بيوصل للمعلم وبيتنفذ بعد موافقته.","Changes go to the teacher and apply after approval.","Les modifications sont appliquées après validation."],
+newPass:["كلمة سر جديدة (اختياري)","New password (optional)","Nouveau mot de passe (facultatif)"],submitReq:["إرسال","Send","Envoyer"],reqPend:["طلب التعديل قيد موافقة المعلم","Your edit request awaits approval","Demande en attente de validation"],
+reqSent:["تم الإرسال","Sent","Envoyé"],noChg:["لم تغيّر أي بيانات","No changes made","Aucun changement"],
+tPay:["طلبات الدفع","Payments","Paiements"],tEd:["طلبات التعديل","Edit requests","Modifications"],tStu:["الطلاب","Students","Élèves"],tMsg:["الرسائل","Messages","Messages"],tSet:["الإعدادات","Settings","Paramètres"],tGr:["الدرجات","Grades","Notes"],
+verify:["راجع صورة التحويل والمبلغ قبل التفعيل.","Check the receipt and amount before activating.","Vérifiez le reçu et le montant avant activation."],rvk:["إلغاء التفعيل","Revoke","Révoquer"],grant:["فتح كورس","Grant course","Ouvrir un cours"],manual:["يدوي","Manual","Manuel"],
+cImg:["صورة الكورس","Course cover","Image du cours"],cDesc:["وصف الكورس","Course description","Description du cours"],aiUrl:["رابط خادم الذكاء الاصطناعي (Proxy)","AI server URL (proxy)","URL du serveur IA (proxy)"],
+supT:["الدعم الفني","Support","Assistance"],supS:["راسلنا على الإيميل وهنرد عليك في أقرب وقت.","Email us and we will reply soon.","Écrivez-nous, nous répondrons vite."],copy:["نسخ الإيميل","Copy email","Copier l'e-mail"],copied:["تم النسخ","Copied","Copié"],
+gmail:["فتح Gmail","Open Gmail","Ouvrir Gmail"],mailapp:["تطبيق البريد","Mail app","Application mail"],full:["مساحة التخزين ممتلئة","Storage is full","Stockage plein"],close:["إغلاق","Close","Fermer"],
+profile:["الملف الشخصي","Profile","Profil"],examBuilder:["أسئلة الامتحان (اختياري — اتركه فارغاً لو الامتحان رابط خارجي)","Exam questions (optional — leave empty for an external link exam)","Questions de l'examen (facultatif)"],
+qText:["نص السؤال","Question text","Texte de la question"],choice:["اختيار","Choice","Choix"],correctChoice:["الاختيار الصحيح","Correct choice","Bonne réponse"],addQuestion:["إضافة سؤال","Add question","Ajouter une question"],
+qAdded:["سؤال","Question","Question"],submitExam:["تسليم الامتحان","Submit exam","Soumettre l'examen"],answerAll:["أجب عن كل الأسئلة أولاً","Please answer all questions","Répondez à toutes les questions"],
+yourScore:["درجتك","Your score","Votre score"],review:["مراجعة الدرجة","Review","Revoir"],details:["التفاصيل","Details","Détails"],examsTaken:["امتحانات أُديت","Exams taken","Examens passés"],
+viewGrades:["عرض الدرجات","View grades","Voir les notes"],allStudents:["كل الطلاب","All students","Tous les élèves"],reauth:["لإتمام تغيير كلمة السر، سجّل خروج ثم دخول مرة أخرى وحاول فوراً","To change your password, log out, log back in, then try again immediately","Déconnectez-vous, reconnectez-vous, puis réessayez aussitôt"],
+lastActive:["آخر نشاط","Last active","Dernière activité"],loading:["جارِ التحميل…","Loading…","Chargement…"],connErr:["حصل خطأ في الاتصال، حاول تاني","Connection error, please try again","Erreur de connexion, réessayez"],
+enableEmail:["فعّل تسجيل الدخول بالإيميل من Supabase → Authentication → Providers → Email","Enable Email sign-in in Supabase → Authentication → Providers → Email","Activez la connexion par e-mail dans Supabase → Authentication → Providers → Email"],
+video2:["فيديو","Video","Vidéo"],type:["النوع","Type","Type"],
+examLinkOptional:["أو ضع رابط امتحان خارجي بدل الأسئلة (اختياري)","Or paste an external exam link instead of questions (optional)","Ou un lien d'examen externe à la place des questions (facultatif)"],
+badDomain:["الدومين اللي الموقع شغال عليه مش مضاف في Firebase Authentication → Settings → Authorized domains","This site's domain isn't added under Firebase Authentication → Settings → Authorized domains","Ce domaine n'est pas ajouté dans Firebase Authentication → Settings → Authorized domains"],
+tooMany:["محاولات كتير غلط، استنى شوية وحاول تاني","Too many attempts, please wait a bit and try again","Trop de tentatives, patientez puis réessayez"],
+bootErr:["ماقدرناش نتأكد من حالة حسابك — تأكد من اتصال الإنترنت وحدّث الصفحة. لو بتفتح الرابط من جوه تطبيق زي فيسبوك/إنستجرام، جرّب تفتحه في متصفح عادي (Chrome/Safari).","Couldn't verify your account status — check your internet connection and refresh the page. If you're opening this link inside an app like Facebook/Instagram, try opening it in a regular browser (Chrome/Safari) instead.","Impossible de vérifier votre compte — vérifiez votre connexion et actualisez la page. Si vous ouvrez ce lien depuis une appli comme Facebook/Instagram, essayez de l'ouvrir dans un navigateur normal (Chrome/Safari)."],
+wait:["جارِ الحفظ...","Saving...","Enregistrement..."],
+needCourseFirst:["لازم تنشئ كورس واحد على الأقل الأول من فوق قبل ما تضيف له محتوى","Create at least one course above first before adding content to it","Créez d'abord un cours ci-dessus avant d'y ajouter du contenu"],
+addToCourse:["إضافة للكورس","Add to course","Ajouter au cours"]};
+for(const k in N)['ar','en','fr'].forEach((l,i)=>L[l][k]=N[k][i]);
+L.ar.email='البريد الإلكتروني';L.en.email='Email address';L.fr.email='Adresse e-mail';
+const t=k=>(L[lg]||L.en)[k]||k;
+const nd=s=>s.replace(/[\u0660-\u0669]/g,d=>d.charCodeAt(0)-1632).replace(/[\u06F0-\u06F9]/g,d=>d.charCodeAt(0)-1776);
+const cl=s=>s.replace(/[\u200b-\u200f\u202a-\u202e\ufeff]/g,'').trim();
+const fd=ts=>new Date(ts).toLocaleString(lg==='ar'?'ar-EG':lg==='fr'?'fr-FR':'en-GB',{dateStyle:'short',timeStyle:'short'});
+function shrink(f,max,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.72))};im.src=r.result};r.readAsDataURL(f)}
+function shrinkP(f,max){return new Promise(res=>shrink(f,max,res))}
+const showM=h=>{$('#md').innerHTML=h;$('#ov').style.display='flex'},closeM=()=>{$('#ov').style.display='none'};
+$('#ov').onclick=e=>{if(e.target.id==='ov')closeM()};
+const wk=()=>{const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-(d.getDay()+1)%7);return d.getTime()};
+const used=e=>db.msgs.filter(m=>m.email===e&&m.from==='s'&&m.ts>=wk()).length;
+const thr=()=>{const g={};db.msgs.forEach(m=>(g[m.email]=g[m.email]||[]).push(m));return Object.values(g).sort((a,b)=>b[b.length-1].ts-a[a.length-1].ts)};
+const unread=()=>thr().filter(a=>a[a.length-1].from==='s').length;
+const pend=()=>db.payments.filter(p=>p.s==='p').length+db.reqs.filter(r=>r.s==='p').length+unread();
+const go=k=>{sec=k;render();scrollTo(0,0)};
+function av(u,s){return u&&u.photo?`<img src="${u.photo}" alt="">`:I('user',s||34)}
+
+/* ---------------- Supabase ---------------- */
+const SUPABASE_URL='https://qfjfwhdyurlxiavomdgu.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_YqeKTLR2mmkRQrEda28H8w_WrNa9nIj';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const ADMIN_EMAIL='ghhbvvbnt@gmail.com';
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}),ms))]);
+
+/* ---- طبقة توافق: بتحاكي واجهة Firebase (auth / fs / storage) لكن شغالة فعلياً بـ Supabase ----
+   الهدف إن باقي كود الموقع (render/state/UI) يفضل زي ما هو بالظبط من غير أي تعديل ---- */
+const TBL={courses:'courses',settings:'settings',teacherProfile:'teacher_profile',users:'profiles',payments:'payments',editRequests:'edit_requests',messages:'messages',examResults:'exam_results'};
+function normUser(u){if(u&&!u.uid)u.uid=u.id;return u}
+function mapAuthErr(err){const m=((err&&err.message)||'').toLowerCase();
+ if(m.includes('already registered')||m.includes('already in use'))return{code:'auth/email-already-in-use',message:err.message};
+ if(m.includes('invalid login credentials')||m.includes('invalid email or password'))return{code:'auth/invalid-credential',message:err.message};
+ if(m.includes('invalid')&&m.includes('email'))return{code:'auth/invalid-email',message:err.message};
+ if(m.includes('password')&&(m.includes('6')||m.includes('character')))return{code:'auth/weak-password',message:err.message};
+ if(m.includes('rate limit')||err.status===429)return{code:'auth/too-many-requests',message:err.message};
+ if(m.includes('disabled')||m.includes('not allowed'))return{code:'auth/operation-not-allowed',message:err.message};
+ if(m.includes('expired')||m.includes('session'))return{code:'auth/requires-recent-login',message:err.message};
+ return{code:'connErr',message:err&&err.message}}
+class DocRef{constructor(coll,id){this.coll=coll;this.tbl=TBL[coll];this.id=id}
+ async get(){const{data,error}=await sb.from(this.tbl).select('*').eq('id',this.id).maybeSingle();if(error)throw error;
+  return{exists:!!data,data:()=>{if(!data)return undefined;const{id,...rest}=data;return rest}}}
+ async set(data){const{error}=await sb.from(this.tbl).upsert({id:this.id,...data});if(error)throw error}
+ async update(data){const{error}=await sb.from(this.tbl).update(data).eq('id',this.id);if(error)throw error}
+ async delete(){const{error}=await sb.from(this.tbl).delete().eq('id',this.id);if(error)throw error}
+ onSnapshot(cb,errCb){const push=()=>this.get().then(s=>cb({exists:s.exists,data:()=>s.exists?s.data():undefined})).catch(e=>errCb&&errCb(e));push();
+  const ch=sb.channel('rtd_'+this.tbl+'_'+this.id+'_'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:this.tbl,filter:'id=eq.'+this.id},push).subscribe();
+  return()=>{try{sb.removeChannel(ch)}catch(e){}}}}
+class Query{constructor(coll){this.coll=coll;this.tbl=TBL[coll];this._w=[];this._o=null}
+ where(f,op,v){this._w.push([f,op,v]);return this}
+ orderBy(f,d){this._o={f,d};return this}
+ doc(id){return new DocRef(this.coll,id)}
+ async get(){let q=sb.from(this.tbl).select('*');for(const[f,op,v]of this._w){if(op==='==')q=q.eq(f,v)}
+  if(this._o)q=q.order(this._o.f,{ascending:this._o.d!=='desc'});
+  const{data,error}=await q;if(error)throw error;
+  return{docs:(data||[]).map(row=>({id:row.id,data:()=>{const{id,...rest}=row;return rest}}))}}
+ add(data){return(async()=>{const{data:row,error}=await sb.from(this.tbl).insert(data).select().single();if(error)throw error;return{id:row.id}})()}
+ onSnapshot(cb,errCb){const push=()=>this.get().then(cb).catch(e=>errCb&&errCb(e));push();
+  const ch=sb.channel('rtq_'+this.tbl+'_'+Math.random().toString(36).slice(2)).on('postgres_changes',{event:'*',schema:'public',table:this.tbl},push).subscribe();
+  return()=>{try{sb.removeChannel(ch)}catch(e){}}}}
+const fs={collection:name=>new Query(name)};
+const auth={currentUser:null,
+ async signInWithEmailAndPassword(email,password){const{data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw mapAuthErr(error);return{user:normUser(data.user)}},
+ async createUserWithEmailAndPassword(email,password){const{data,error}=await sb.auth.signUp({email,password});if(error)throw mapAuthErr(error);if(!data.user)throw{code:'connErr'};return{user:normUser(data.user)}},
+ async signOut(){await sb.auth.signOut()},
+ onAuthStateChanged(cb){sb.auth.onAuthStateChange((event,session)=>{const u=session?normUser(session.user):null;
+  auth.currentUser=u?{...u,updatePassword:async np=>{const{error}=await sb.auth.updateUser({password:np});if(error)throw mapAuthErr(error)}}:null;
+  cb(u)})}};
+function dataURLtoBlob(dataUrl){const[meta,b64]=dataUrl.split(',');const mime=(/data:(.*?);base64/.exec(meta)||[])[1]||'image/jpeg';
+ const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime})}
+async function uploadImage(file,path,max){const dataUrl=await shrinkP(file,max);const blob=dataURLtoBlob(dataUrl);
+ const idx=path.indexOf('/'),bucket=path.slice(0,idx),key=path.slice(idx+1);
+ const{error}=await sb.storage.from(bucket).upload(key,blob,{upsert:true,contentType:blob.type});if(error)throw error;
+ const{data}=sb.storage.from(bucket).getPublicUrl(key);return data.publicUrl}
+
+/* ---------------- state ---------------- */
+let lg=localStorage.getItem('np_lang')||'ar';
+let db={courses:[],users:[],payments:[],reqs:[],msgs:[],examResults:[],wallet:'01027944588',insta:'mohammed577y@instapay',ai:'',teacherName:'Mohammed Yasser',teacherPhoto:'',teacherBio:''};
+let me=null,cur=null,sec='home',mode='login',fg='all',ft='all',pz=null,pmth='vc',er='',booting=true,payFile=null,payBusy=false,gErr='';
+const th0=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=th0;
+function toggleTheme(){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark'}
+const isT=()=>me&&me.role==='teacher';
+const NAV=()=>[['home','home','home'],['courses','book','cs'],['ai','spark','ai'],...(isT()?[['dash','sliders','dash']]:[['mentor','chat','buddy'],['profile','id','pf']])];
+let dt='pay',editing=false,aih=[],busy=false,abusy=false,unsubs=[],itype='video',examBuilder=[],examState=null,examAns=[],expandedGrade=null,grFilterEmail='',icSel='',itemDraft={title:'',url:''},eqDraft=blankEQ(),cDraft=blankCDraft(),grantSel={},dErr='',dOk='';
+function blankEQ(){return{q:'',c:['','','',''],cr:0}}
+function blankCDraft(){return{ct:'',cd:'',cg:0,ctr:(TR[0]&&TR[0][0])||'',cp:'',cf:null}}
+
+/* ---------------- render ---------------- */
+function render(){
+ const h=document.documentElement;h.lang=lg;h.dir=lg==='ar'?'rtl':'ltr';$('#lg').value=lg;$('#tag').textContent=t('tag');$('#logo').innerHTML=I('code',20);$('#th').innerHTML=I('theme',18);
+ $('#lo').style.display=me?'':'none';$('#lo').innerHTML=I('out',16)+' '+t('out');$('#dk').style.display=me?'flex':'none';
+ const ge=$('#gerr');if(ge){if(gErr&&me&&!booting){ge.style.display='block';ge.innerHTML=`<div class="bx" style="border-color:#e74c3c;display:flex;justify-content:space-between;gap:10px;align-items:center"><small style="color:#e74c3c">⚠ ${esc(gErr)}</small><button class="c" style="flex:none" onclick="gErr='';render()">${t('close')}</button></div>`}else{ge.style.display='none';ge.innerHTML=''}}
+ if(booting){$('#m').innerHTML=`<p style="text-align:center;padding:60px 0;color:var(--mut)">${t('loading')}</p>`;return}
+ if(!me){$('#m').innerHTML=vAuth();return}
+ const pc=isT()?pend():0;
+ $('#dk').innerHTML=NAV().map(([k,i,l])=>`<button class="${sec===k||(k==='courses'&&(sec==='course'||sec==='exam'))?'on':''}" onclick="go('${k}')">${I(i,20)}<em>${t(l)}</em>${k==='dash'&&pc?`<b class="nt">${pc}</b>`:''}</button>`).join('')+`<button onclick="openSup()">${I('life',20)}<em>${t('help')}</em></button>`;
+ $('#m').innerHTML=({home:vHome,courses:vCourses,course:vCourse,exam:vExam,ai:vAI,mentor:vMentor,profile:vProf,dash:vDash}[sec]||vHome)();
+ const b=$('.chat');if(b)b.scrollTop=b.scrollHeight}
+
+/* ---------------- auth ---------------- */
+function vAuth(){const r=mode==='reg',A='autocapitalize="off" autocorrect="off" spellcheck="false"';
+ return `<div class="au"><div class="ic">${I(r?'userplus':'lock',26)}</div><h2>${t(r?'create':'welcome')}</h2><p>${t(r?'csub':'lsub')}</p>
+ ${r?`<input id="n" placeholder="${t('name')}"><input id="e" type="email" ${A} placeholder="${t('mail')}"><input id="a" type="number" placeholder="${t('age')}"><select id="g">${[0,1,2].map(i=>`<option value="${i}">${t('g'+i)}</option>`).join('')}</select><input id="sp" type="tel" placeholder="${t('sp')}"><input id="pp" type="tel" placeholder="${t('pp')}"><input id="p" type="password" placeholder="${t('pass')}"><input id="p2" type="password" placeholder="${t('pass2')}">`:`<input id="e" type="email" ${A} autocomplete="username" placeholder="${t('email')}"><input id="p" type="password" ${A} autocomplete="current-password" placeholder="${t('pass')}">`}
+ <div class="er">${er}</div><button class="nb" ${abusy?'disabled':''} onclick="doAuth()">${abusy?'…':t(r?'create':'login')}</button><button class="lk" onclick="mode='${r?'login':'reg'}';er='';render()">${t(r?'hasacc':'noacc')}</button></div>`}
+async function doAuth(){const v=i=>$('#'+i)?cl($('#'+i).value):'',e=nd(v('e')).toLowerCase(),p=v('p'),bad=k=>{er=t(k);abusy=false;render()};
+ if(abusy)return;
+ if(mode==='login'){
+  if(!e||!p)return bad('e1');
+  abusy=true;er='';render();
+  const credBad=c=>['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-login-credentials'].includes(c);
+  try{
+   if(e===ADMIN_EMAIL){
+    try{await auth.signInWithEmailAndPassword(e,p)}
+    catch(err){
+     if(credBad(err.code)){
+      try{await auth.createUserWithEmailAndPassword(e,p)}
+      catch(err2){throw err2.code==='auth/email-already-in-use'?err:err2}
+     }else throw err;
+    }
+   }else{
+    await auth.signInWithEmailAndPassword(e,p);
+   }
+  }catch(err){
+   if(credBad(err.code))return bad('e2');
+   if(err.code==='auth/invalid-email')return bad('e6');
+   if(err.code==='auth/weak-password')return bad('e3');
+   if(err.code==='auth/operation-not-allowed'){er=t('enableEmail');abusy=false;render();return}
+   if(err.code==='auth/unauthorized-domain'){er=t('badDomain');abusy=false;render();return}
+   if(err.code==='auth/too-many-requests'){er=t('tooMany');abusy=false;render();return}
+   er=t('connErr');abusy=false;render();return;
+  }
+ }else{
+  const n=v('n'),a=nd(v('a')),sp=nd(v('sp')),pp=nd(v('pp'));
+  if(!n||!e||!a||!sp||!pp||!p)return bad('e1');
+  if(!/^\S+@\S+\.\S+$/.test(e))return bad('e6');
+  if(p.length<6)return bad('e3');
+  if(p!==v('p2'))return bad('e4');
+  abusy=true;er='';render();
+  try{
+   const cred=await auth.createUserWithEmailAndPassword(e,p);
+   await fs.collection('users').doc(cred.user.uid).set({name:n,email:e,age:a,g:+v('g'),phone:sp,parent:pp,photo:'',date:new Date().toLocaleDateString(),createdAt:Date.now(),lastActive:Date.now()});
+  }catch(err){
+   if(err.code==='auth/email-already-in-use')return bad('e5');
+   if(err.code==='auth/invalid-email')return bad('e6');
+   if(err.code==='auth/weak-password')return bad('e3');
+   if(err.code==='auth/operation-not-allowed'){er=t('enableEmail');abusy=false;render();return}
+   if(err.code==='auth/unauthorized-domain'){er=t('badDomain');abusy=false;render();return}
+   if(err.code==='auth/too-many-requests'){er=t('tooMany');abusy=false;render();return}
+   er=t('connErr');abusy=false;render();return;
+  }
+ }
+ abusy=false;er=''}
+function doLogout(){auth.signOut().catch(()=>{})}
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(e.target.id==='aiq'&&!e.shiftKey){e.preventDefault();sendAI()}else if(!me&&e.target.tagName==='INPUT'&&e.target.closest('.au')){e.preventDefault();doAuth()}});
+
+/* ---------------- auth state / data subscriptions ---------------- */
+const bootWatchdog=setTimeout(()=>{if(booting){booting=false;er=t('bootErr');render()}},12000);
+auth.onAuthStateChanged(async user=>{
+ clearTimeout(bootWatchdog);
+ unsubs.forEach(u=>{try{u()}catch(e){}});unsubs=[];
+ booting=false;
+ if(!user){me=null;sec='home';mode='login';er='';aih=[];render();return}
+ try{
+  const isTeacher=user.email===ADMIN_EMAIL;
+  if(isTeacher){
+   me={role:'teacher',uid:user.uid,email:user.email,name:db.teacherName,photo:db.teacherPhoto};
+  }else{
+   const snap=await withTimeout(fs.collection('users').doc(user.uid).get(),12000);
+   const d=snap.exists?snap.data():{name:user.email,email:user.email,age:'',g:0,phone:'',parent:'',photo:'',date:new Date().toLocaleDateString()};
+   me={role:'student',uid:user.uid,...d};
+   fs.collection('users').doc(user.uid).update({lastActive:Date.now()}).catch(()=>{});
+  }
+  sec='home';mode='login';aih=[];editing=false;fg=me.role==='student'?String(me.g):'all';
+  subscribeAll();
+ }catch(e){er=t('connErr')}
+ render();
+});
+function subscribeAll(){
+ const onErr=e=>{gErr=(e&&e.message)||t('connErr');render()};
+ unsubs.push(fs.collection('courses').orderBy('createdAt','desc').onSnapshot(s=>{db.courses=s.docs.map(d=>({id:d.id,...d.data(),items:d.data().items||[]}));gErr='';render()},onErr));
+ unsubs.push(fs.collection('settings').doc('main').onSnapshot(s=>{const d=s.data()||{};db.wallet=d.wallet||'01027944588';db.insta=d.insta||'mohammed577y@instapay';db.ai=d.ai||'';render()},onErr));
+ unsubs.push(fs.collection('teacherProfile').doc('main').onSnapshot(s=>{const d=s.data()||{};db.teacherName=d.name||'Mohammed Yasser';db.teacherPhoto=d.photo||'';db.teacherBio=d.bio||'';if(me&&me.role==='teacher'){me.name=db.teacherName;me.photo=db.teacherPhoto}render()},onErr));
+ if(me.role==='teacher'){
+  unsubs.push(fs.collection('users').onSnapshot(s=>{db.users=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
+  unsubs.push(fs.collection('payments').orderBy('ts','desc').onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
+  unsubs.push(fs.collection('editRequests').orderBy('ts','desc').onSnapshot(s=>{db.reqs=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
+  unsubs.push(fs.collection('messages').onSnapshot(s=>{db.msgs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);render()},onErr));
+  unsubs.push(fs.collection('examResults').onSnapshot(s=>{db.examResults=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
+ }else{
+  unsubs.push(fs.collection('payments').where('email','==',me.email).onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
+  unsubs.push(fs.collection('editRequests').where('email','==',me.email).onSnapshot(s=>{db.reqs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
+  unsubs.push(fs.collection('messages').where('email','==',me.email).onSnapshot(s=>{db.msgs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);render()},onErr));
+  unsubs.push(fs.collection('examResults').where('email','==',me.email).onSnapshot(s=>{db.examResults=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
+ }
+}
+
+/* ---------------- home ---------------- */
+function card(){const n=isT()?db.teacherName:me.name;return `<div class="lan"><div class="id"><div class="hd"><div class="av">${av(me,34)}</div></div><div class="bd"><b>${esc(n)}</b><div><small>${isT()?t('role'):t('g'+me.g)}</small></div><div class="bar">${Array.from({length:28},(_,i)=>`<i style="height:${8+((i*7)%17)}px"></i>`).join('')}</div></div></div></div>`}
+function vHome(){
+ return `<section class="hero"><div><span class="bdg">${t('avail')}</span><h1>${t('hi')}<br><span class="g">${esc(db.teacherName)}</span></h1><p>${esc(db.teacherBio)||t('hp')}</p><button class="bt" onclick="go('courses')">${t('browse')} <i class="ar">${I('arrow',16)}</i></button></div>${card()}</section>
+ <div class="mq"><div>${[...TR,...TR].map(([n])=>`<span>${n}</span>`).join('')}</div></div>
+ <h3 class="sec">${t('lang')}</h3><div class="grid">${TR.map(([n,i])=>`<div class="cd" style="cursor:pointer" onclick="ft='${n}';go('courses')"><div class="mono">${i}</div><h4>${n}</h4><small style="color:var(--mut)">${db.courses.filter(c=>c.tr===n).length} ${t('courses')}</small></div>`).join('')}</div>`}
+
+/* ---------------- courses ---------------- */
+function status(c){if(isT())return'T';if(!c.price)return'O';const p=db.payments.filter(x=>x.email===me.email&&x.cid===c.id);return p.some(x=>x.s==='a')?'O':p.some(x=>x.s==='p')?'P':'B'}
+const cover=c=>c.img?`<img class="cvi" src="${c.img}" alt="">`:`<div class="cvi ph"><div class="mono" style="margin:0">${(TR.find(x=>x[0]===c.tr)||['','NP'])[1]}</div></div>`;
+function vCourses(){
+ const l=db.courses.filter(c=>(fg==='all'||c.g==fg)&&(ft==='all'||c.tr===ft));
+ const chip=(on,f,l2)=>`<button class="c ${on?'on':''}" onclick="${f}">${l2}</button>`;
+ return `<div class="ch">${['all',0,1,2].map(g=>chip(fg==g,`fg='${g}';render()`,g==='all'?t('all'):t('g'+g))).join('')}</div>
+ <div class="ch">${chip(ft==='all',`ft='all';render()`,t('all'))}${TR.map(([n])=>chip(ft===n,`ft='${n}';render()`,n)).join('')}</div>
+ <div class="grid">${l.map(c=>{const s=status(c);return `<div class="cd cs">${cover(c)}<span class="tg">${t('g'+c.g)}</span><span class="tg">${esc(c.tr)}</span><h4>${esc(c.title)}</h4>${c.desc?`<p class="ds">${esc(c.desc)}</p>`:''}<small style="color:var(--mut)">${(c.items||[]).length} ${t('items')}</small><div class="pr">${c.price?c.price+' '+t('egp'):t('free')}</div>${s==='B'||s==='P'?`<small class="no" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">${I('lock',14)} ${t('locked')}</small>`:''}
+ ${s==='O'||s==='T'?`<button class="b" onclick="openC('${c.id}')">${I('play',15)} ${t('open')}</button>`:s==='P'?`<button class="b s" disabled>${I('clock',16)} ${t('pend')}</button>`:`<button class="b" onclick="openPay('${c.id}')">${t('buy')}</button>`}
+ ${s==='T'?`<button class="b s no" onclick="delC('${c.id}')">${t('del')}</button>`:''}</div>`}).join('')||`<p>${t('none')}</p>`}</div>`}
+function openC(id){const c=db.courses.find(x=>x.id===id),s=status(c);if(s==='O'||s==='T'){cur=id;go('course')}else openPay(id)}
+function vCourse(){const c=db.courses.find(x=>x.id===cur);if(!c)return '';const s=status(c);if(s!=='O'&&s!=='T'){sec='courses';return vCourses()}
+ return `<button class="c bk" style="display:inline-flex;gap:6px;align-items:center" onclick="go('courses')">${I('arrow',14)} ${t('back')}</button><div class="cd" style="margin:14px 0;padding:0">${cover(c).replace('cvi','cvi wide')}<div style="padding:16px"><h3 style="margin:0 0 6px">${esc(c.title)}</h3><p class="ds" style="-webkit-line-clamp:unset">${esc(c.desc||'')}</p></div></div>
+ <div class="grid">${(c.items||[]).map(it=>itemCard(c,it)).join('')||`<p>${t('noItems')}</p>`}</div>`}
+function itemCard(c,it){
+ if(it.type==='exam'&&it.questions&&it.questions.length){
+  const res=db.examResults.find(r=>r.itemId===it.id&&r.email===me.email);
+  return `<div class="cd"><span class="tg">${t('exam')}</span><div class="mono" style="margin-top:8px">${I('exam',22)}</div><h4>${esc(it.title)}</h4>
+  ${res?`<div class="pr">${res.score}/${res.max}</div><button class="b s" onclick="reviewExam('${res.id}')">${t('review')}</button>`:`<button class="b" onclick="startExam('${c.id}','${it.id}')">${t('startExam')}</button>`}
+  ${isT()?`<button class="b s no" onclick="delI('${c.id}','${it.id}')">${t('del')}</button>`:''}</div>`;
+ }
+ return `<div class="cd"><span class="tg">${t(it.type)}</span><div class="mono" style="margin-top:8px">${I(it.type,22)}</div><h4>${esc(it.title)}</h4><a class="b" href="${esc(it.url||'#')}" target="_blank" rel="noopener">${t(it.type==='video'?'watch':it.type==='pdf'?'openPdf':'startExam')}</a>${isT()?`<button class="b s no" onclick="delI('${c.id}','${it.id}')">${t('del')}</button>`:''}</div>`}
+async function delI(cid,iid){const c=db.courses.find(x=>x.id===cid);if(!c)return;try{await fs.collection('courses').doc(cid).update({items:(c.items||[]).filter(i=>i.id!==iid)})}catch(e){alert(t('connErr'))}}
+async function delC(id){if(!confirm('?'))return;try{await fs.collection('courses').doc(id).delete()}catch(e){alert(t('connErr'))}}
+
+/* ---------------- exam taking ---------------- */
+function startExam(cid,iid){examState={cid,iid};examAns=[];sec='exam';render()}
+function vExam(){const c=db.courses.find(x=>x.id===examState.cid);const it=c&&(c.items||[]).find(i=>i.id===examState.iid);if(!it)return'';
+ return `<h3 class="sec" style="text-align:start">${esc(it.title)}</h3>
+ ${it.questions.map((q,i)=>`<div class="bx"><b>${i+1}. ${esc(q.q)}</b>${q.choices.map((ch,ci)=>`<div style="margin-top:6px"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="radio" name="eq${i}" ${examAns[i]===ci?'checked':''} onchange="examAns[${i}]=${ci}"> ${esc(ch)}</label></div>`).join('')}</div>`).join('')}
+ <button class="b" onclick="submitExam()">${t('submitExam')}</button>
+ <button class="b s" onclick="sec='course';render()">${t('cancel')}</button>`}
+async function submitExam(){const c=db.courses.find(x=>x.id===examState.cid);const it=c&&(c.items||[]).find(i=>i.id===examState.iid);if(!it)return;
+ if(examAns.filter(a=>a!==undefined&&a!==null).length<it.questions.length)return alert(t('answerAll'));
+ let score=0;const answers=it.questions.map((q,i)=>{const ci=examAns[i],ok=ci===q.correct;if(ok)score++;return{q:q.q,chosen:q.choices[ci],ok,correctText:q.choices[q.correct]}});
+ try{
+  await fs.collection('examResults').add({uid:me.uid,email:me.email,name:me.name,courseId:c.id,courseTitle:c.title,itemId:it.id,examTitle:it.title,answers,score,max:it.questions.length,ts:Date.now()});
+  examAns=[];sec='course';render();alert(`${t('yourScore')}: ${score}/${it.questions.length}`);
+ }catch(e){alert(t('connErr'))}}
+function reviewExam(id){const r=db.examResults.find(x=>x.id===id);if(!r)return;showM(`<h3 style="margin-top:0">${esc(r.examTitle)} — ${r.score}/${r.max}</h3>${r.answers.map((a,i)=>`<div class="rw"><span>${i+1}. ${esc(a.q)}</span><span class="${a.ok?'ok':'no'}">${esc(a.chosen)}${a.ok?'':' → '+esc(a.correctText)}</span></div>`).join('')}<button class="b s" onclick="closeM()">${t('close')}</button>`)}
+
+/* ---------------- AI ---------------- */
+const SYS='You are "NP AI", an expert programming mentor inside the "Not Programming" learning platform (students are Egyptian secondary-school pupils and self-learners). Teach step by step, give correct modern code in fenced code blocks with the language name, explain briefly why it works, point out bugs precisely, and suggest a small practice exercise when useful. Prefer clear simple explanations over long lectures. Always answer in the language the student writes in (Arabic - Egyptian dialect is fine, English or French). If asked something unrelated to programming, computing or studying, politely steer back. Never claim to have run code you have not run.';
+function md(s){const bl=[];s=esc(s).replace(/```\w*\n?([\s\S]*?)```/g,(_,c)=>{bl.push(c);return '\u0000'+(bl.length-1)+'\u0000'});s=s.replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');return s.replace(/\u0000(\d+)\u0000/g,(_,i)=>`<pre dir="ltr"><code>${bl[i]}</code></pre>`)}
+let aiu={};
+function aiN(){const d=new Date().toDateString(),u=aiu[me.email]||(aiu[me.email]={d,n:0});if(u.d!==d){u.d=d;u.n=0}return u}
+function vAI(){return `<h3 class="sec" style="text-align:start">${t('aiT')}</h3><p style="color:var(--mut)">${t('aiS')}</p>
+ <div class="ch">${['q1','q2','q3'].map(k=>`<button class="c" onclick="sendAI(t('${k}'))">${t(k)}</button>`).join('')}</div>
+ <div class="chat big">${aih.map(m=>`<div class="bub ${m.r==='user'?'me':''}"><small>${m.r==='user'?t('you'):'NP AI'}</small>${md(m.c)}</div>`).join('')}${busy?`<div class="bub"><small>NP AI</small>${t('aiThink')}</div>`:''}</div>
+ <div class="rowin"><textarea id="aiq" rows="2" placeholder="${t('aiP')}"></textarea><button class="b" style="width:auto" onclick="sendAI()">${I('send',16)}</button></div>`}
+async function sendAI(x){x=cl(x||$('#aiq').value);if(!x||busy)return;const u=aiN();if(u.n>=40)return alert(t('aiLim'));
+ aih.push({r:'user',c:x});busy=true;render();
+ if(!db.ai){aih.push({r:'assistant',c:t('aiErr'),e:1});busy=false;return render()}
+ try{const r=await fetch(db.ai,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:SYS,messages:aih.filter(m=>!m.e).slice(-12).map(m=>({role:m.r,content:m.c}))})});
+  const d=await r.json(),tx=(d.content||[]).map(y=>y.text||'').join('');if(!tx)throw 0;aih.push({r:'assistant',c:tx});u.n++}
+ catch(e){aih.push({r:'assistant',c:t('aiErr'),e:1})}
+ busy=false;render()}
+
+/* ---------------- mentor (student -> teacher chat) ---------------- */
+function vMentor(){const th=db.msgs.filter(m=>m.email===me.email),left=Math.max(0,3-used(me.email));
+ return `<h3 class="sec" style="text-align:start">${t('buddy')}</h3><p style="color:var(--mut)">${t('buddyS')}</p>
+ <div class="bx"><b>${t('left')}: ${left}/3</b> <small style="color:var(--mut)">· ${t('resets')}</small></div>
+ <div class="chat">${th.map(m=>`<div class="bub ${m.from==='s'?'me':''}"><small>${m.from==='s'?t('you'):t('teacher')} · ${fd(m.ts)}</small>${esc(m.text).replace(/\n/g,'<br>')}</div>`).join('')||`<p style="color:var(--mut);text-align:center">${t('none')}</p>`}</div>
+ ${left?`<div class="rowin"><textarea id="mq" maxlength="500" rows="2" placeholder="${t('msgP')}"></textarea><button class="b" style="width:auto" onclick="sendM()">${I('send',16)} ${t('sendB')}</button></div>`:`<p class="no">${t('limit')}</p>`}`}
+async function sendM(){const x=cl($('#mq').value);if(!x)return;if(used(me.email)<3){try{await fs.collection('messages').add({uid:me.uid,email:me.email,name:me.name,from:'s',text:x,ts:Date.now()})}catch(e){alert(t('connErr'))}}}
+
+/* ---------------- profile (student) ---------------- */
+function vProf(){const my=db.payments.filter(p=>p.email===me.email),rq=db.reqs.find(r=>r.email===me.email&&r.s==='p');
+ const rows=[[t('name'),me.name],[t('mail'),me.email],[t('age'),me.age],[t('grade'),t('g'+me.g)],[t('sp'),me.phone],[t('par'),me.parent],[t('reg'),me.date]].map(([a,b])=>`<div class="rw"><span>${a}</span><b>${esc(b||'')}</b></div>`).join('');
+ return `<section class="hero"><div class="bx"><div style="display:flex;align-items:center;gap:14px;margin-bottom:12px"><div class="av2">${av(me,40)}</div><label class="c" style="cursor:pointer;display:inline-flex;gap:6px;align-items:center">${I('camera',15)} ${t('photo')}<input type="file" accept="image/*" hidden onchange="setPhoto(this)"></label></div>
+ ${editing?`<p style="color:var(--mut);font-size:13px">${t('editNote')}</p><input id="fn" value="${esc(me.name)}"><input id="fa" value="${esc(me.age)}"><input id="fs" type="tel" value="${esc(me.phone)}"><input id="fp" type="tel" value="${esc(me.parent)}"><input id="fw" type="password" autocomplete="new-password" placeholder="${t('newPass')}"><button class="b" onclick="subReq()">${t('submitReq')}</button><button class="b s" onclick="editing=false;render()">${t('cancel')}</button>`:rows+(rq?`<p class="wt">${t('reqPend')}</p>`:`<button class="b s" onclick="editing=true;render()">${I('edit',15)} ${t('editInfo')}</button>`)}</div>${card()}</section>
+ <div class="bx"><h4>${t('bought')}</h4>${my.map(p=>`<div class="rw"><span>${esc(p.title)} — ${p.amount} ${t('egp')}</span><span class="${p.s==='a'?'ok':p.s==='p'?'wt':'no'}">${p.s==='a'?t('active'):p.s==='p'?t('pend'):t('rej')}</span></div>`).join('')||t('none')}</div>`}
+async function setPhoto(inp){const f=inp.files[0];if(!f)return;try{const url=await uploadImage(f,`students/${me.uid}.jpg`,300);await fs.collection('users').doc(me.uid).update({photo:url});me.photo=url;render()}catch(e){alert(t('connErr'))}}
+async function subReq(){const n=cl($('#fn').value),a=nd(cl($('#fa').value)),s=nd(cl($('#fs').value)),p=nd(cl($('#fp').value)),w=cl($('#fw').value);
+ const ch={};if(n&&n!==me.name)ch.name=n;if(a&&a!==String(me.age))ch.age=a;if(s&&s!==me.phone)ch.phone=s;if(p&&p!==me.parent)ch.parent=p;
+ if(w){if(w.length<6)return alert(t('e3'));try{await auth.currentUser.updatePassword(w)}catch(err){return alert(err.code==='auth/requires-recent-login'?t('reauth'):t('connErr'))}}
+ if(!Object.keys(ch).length){editing=false;render();if(!w)alert(t('noChg'));return}
+ try{await fs.collection('editRequests').add({uid:me.uid,email:me.email,name:me.name,ch,ts:Date.now(),s:'p'});editing=false;render();alert(t('reqSent'))}catch(e){alert(t('connErr'))}}
+
+/* ---------------- teacher dashboard ---------------- */
+function vDash(){const cnt={pay:db.payments.filter(p=>p.s==='p').length,ed:db.reqs.filter(r=>r.s==='p').length,msg:unread()};
+ const tabs=[['pay','tPay'],['ed','tEd'],['crs','cs'],['stu','tStu'],['gr','tGr'],['msg','tMsg'],['set','tSet']];
+ return `<div class="ch">${tabs.map(([k,l])=>`<button class="c ${dt===k?'on':''}" onclick="dt='${k}';render()">${t(l)}${cnt[k]?` (${cnt[k]})`:''}</button>`).join('')}</div>`+({pay:dPay,ed:dEd,crs:dCrs,stu:dStu,gr:dGr,msg:dMsg,set:dSet}[dt])()}
+function dPay(){return `<p style="color:var(--mut);font-size:13px">${t('verify')}</p>`+([...db.payments].map(p=>`<div class="bx"><div class="pay">${p.img?`<img class="th" src="${p.img}" alt="" onclick="zoom('${p.id}')">`:''}<div style="flex:1;min-width:150px"><b>${esc(p.name)}</b><div style="color:var(--mut);font-size:13px">${esc(p.phone||'')}</div><div>${esc(p.title)} — ${p.amount} ${t('egp')}</div><small style="color:var(--mut)">${t(p.m)} · ${fd(p.ts)}</small></div>
+ <div style="min-width:120px">${p.s==='p'?`<button class="b" onclick="setP('${p.id}','a')">${I('check',15)} ${t('ap')}</button><button class="b s no" onclick="setP('${p.id}','r')">${t('rj')}</button>`:`<span class="${p.s==='a'?'ok':'no'}">${t(p.s==='a'?'active':'rej')}</span>${p.s==='a'?`<button class="b s" onclick="setP('${p.id}','r')">${t('rvk')}</button>`:''}`}</div></div></div>`).join('')||`<p>${t('none')}</p>`)}
+function zoom(id){const p=db.payments.find(x=>x.id===id);showM(`<img src="${p.img}" style="width:100%;border-radius:12px" alt=""><button class="b s" onclick="closeM()">${t('close')}</button>`)}
+async function setP(id,s){try{await fs.collection('payments').doc(id).update({s})}catch(e){alert(t('connErr'))}}
+function dEd(){const lb={name:'name',age:'age',phone:'sp',parent:'pp'};
+ return db.reqs.filter(r=>r.s==='p').map(r=>{const u=db.users.find(x=>x.email===r.email)||{};return `<div class="bx"><b>${esc(r.name)}</b> <small style="color:var(--mut)">${fd(r.ts)}</small>${Object.entries(r.ch).map(([k,v])=>`<div class="rw"><span>${t(lb[k]||k)}</span><span>${esc(u[k]??'')} → <b>${esc(v)}</b></span></div>`).join('')}<div style="display:flex;gap:8px"><button class="b" onclick="setR('${r.id}','a')">${t('ap')}</button><button class="b s no" onclick="setR('${r.id}','r')">${t('rj')}</button></div></div>`}).join('')||`<p>${t('none')}</p>`}
+async function setR(id,s){try{const r=db.reqs.find(x=>x.id===id);if(s==='a'&&r.uid)await fs.collection('users').doc(r.uid).update(r.ch);await fs.collection('editRequests').doc(id).update({s})}catch(e){alert(t('connErr'))}}
+function dCrs(){const o=(a,sel)=>a.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(sel)?'selected':''}>${l}</option>`).join('');
+ if(!db.courses.find(x=>x.id===icSel))icSel=(db.courses[0]&&db.courses[0].id)||'';
+ return `${dErr?`<div class="bx" style="border-color:#e74c3c"><small style="color:#e74c3c">⚠ ${esc(dErr)}</small></div>`:''}${dOk?`<div class="bx" style="border-color:#2ecc71"><small style="color:#2ecc71">✓ ${esc(dOk)}</small></div>`:''}<div class="bx"><h4>${t('newC')}</h4><input id="ct" placeholder="${t('ct')}" value="${esc(cDraft.ct)}" oninput="cDraft.ct=this.value"><textarea id="cd" rows="3" placeholder="${t('cDesc')}" oninput="cDraft.cd=this.value">${esc(cDraft.cd)}</textarea><select id="cg" onchange="cDraft.cg=+this.value">${o([0,1,2].map(i=>[i,t('g'+i)]),cDraft.cg)}</select><select id="cr" onchange="cDraft.ctr=this.value">${o(TR.map(x=>[x[0],x[0]]),cDraft.ctr)}</select><input id="cp" type="number" min="0" placeholder="${t('price')}" value="${esc(cDraft.cp)}" oninput="cDraft.cp=nd(this.value)"><small style="color:var(--mut)">${t('cImg')}</small><input id="cf" type="file" accept="image/*" onchange="cDraft.cf=this.files[0]||null;render()">${cDraft.cf?`<small style="color:var(--ok,#2ecc71)">✓ ${esc(cDraft.cf.name)}</small>`:''}<button class="b" ${abusy?'disabled':''} onclick="addC()">${abusy?t('wait'):t('publish')}</button></div>
+ <div class="bx"><h4>${t('addItem')}</h4><select id="ic" onchange="icSel=this.value">${db.courses.length?o(db.courses.map(c=>[c.id,esc(c.title)]),icSel):`<option value="">${t('needCourseFirst')}</option>`}</select><select id="it" onchange="itype=this.value;render()">${o([['video',t('video')],['exam',t('exam')],['pdf',t('pdf')]],itype)}</select><input id="ii" placeholder="${t('itemTitle')}" value="${esc(itemDraft.title)}" oninput="itemDraft.title=this.value">
+ ${itype==='exam'?examBuilderUI():''}
+ <input id="iu" dir="ltr" placeholder="${itype==='exam'?t('examLinkOptional'):t('itemUrl')}" value="${esc(itemDraft.url)}" oninput="itemDraft.url=this.value">
+ <button class="b" ${abusy?'disabled':''} onclick="addI()">${abusy?t('wait'):t('addToCourse')}</button></div>
+ <div class="bx">${db.courses.length?db.courses.map(c=>`<div class="rw"><span>${esc(c.title)} <small style="color:var(--mut)">(${(c.items||[]).length})</small></span><span><button class="c" onclick="openC('${c.id}')">${t('open')}</button> <button class="c no" onclick="delC('${c.id}')">${t('del')}</button></span></div>`).join(''):`<small style="color:var(--mut)">${t('noItems')}</small>`}</div>`}
+function examBuilderUI(){
+ return `<div class="bx" style="background:var(--bg)"><small style="color:var(--mut)">${t('examBuilder')}</small>
+ <input id="eq" placeholder="${t('qText')}" value="${esc(eqDraft.q)}" oninput="eqDraft.q=this.value">
+ <input id="ec0" placeholder="${t('choice')} 1" value="${esc(eqDraft.c[0])}" oninput="eqDraft.c[0]=this.value"><input id="ec1" placeholder="${t('choice')} 2" value="${esc(eqDraft.c[1])}" oninput="eqDraft.c[1]=this.value"><input id="ec2" placeholder="${t('choice')} 3" value="${esc(eqDraft.c[2])}" oninput="eqDraft.c[2]=this.value"><input id="ec3" placeholder="${t('choice')} 4" value="${esc(eqDraft.c[3])}" oninput="eqDraft.c[3]=this.value">
+ <select id="ecr" onchange="eqDraft.cr=+this.value">${[0,1,2,3].map(i=>`<option value="${i}" ${eqDraft.cr===i?'selected':''}>${t('correctChoice')} ${i+1}</option>`).join('')}</select>
+ <button class="b s" onclick="addEQ()">${t('addQuestion')}</button>
+ ${examBuilder.map((q,i)=>`<div class="rw"><span>${t('qAdded')} ${i+1}: ${esc(q.q)}</span><button class="c no" onclick="examBuilder.splice(${i},1);render()">${t('del')}</button></div>`).join('')}</div>`}
+function addEQ(){const q=cl(eqDraft.q),raw=eqDraft.c.map(c=>cl(c)),kept=raw.map((c,i)=>({c,i})).filter(x=>x.c);
+ if(!q||kept.length<2)return alert(t('e1'));
+ const correct=kept.findIndex(x=>x.i===eqDraft.cr);
+ if(correct===-1)return alert(t('e1'));
+ examBuilder.push({q,choices:kept.map(x=>x.c),correct});eqDraft=blankEQ();render()}
+async function addC(){if(abusy)return;const ti=cl(cDraft.ct);if(!ti){dErr=t('ct');dOk='';return render()}
+ const f=cDraft.cf;
+ abusy=true;dErr='';dOk='';render();
+ const payload={title:ti,desc:cl(cDraft.cd),g:+cDraft.cg,tr:cDraft.ctr,price:+cDraft.cp||0,items:[],createdAt:Date.now()};
+ try{
+  if(f)payload.img=await uploadImage(f,`courses/${Date.now()}.jpg`,700);
+  await fs.collection('courses').add(payload);
+  dOk=lg==='ar'?`تم إنشاء كورس "${ti}" بنجاح`:lg==='fr'?`Cours « ${ti} » créé avec succès`:`Course "${ti}" created successfully`;
+  cDraft=blankCDraft();
+ }catch(e){dOk='';dErr=(e&&(e.message||e.code))||t('connErr')}
+ abusy=false;render()}
+async function addI(){if(abusy)return;
+ if(!db.courses.length){dErr=t('needCourseFirst');dOk='';return render()}
+ if(!db.courses.find(x=>x.id===icSel))icSel=(db.courses[0]&&db.courses[0].id)||'';
+ const c=db.courses.find(x=>x.id===icSel);if(!c)return;
+ const ti=cl(itemDraft.title),type=itype,u=cl(itemDraft.url);
+ const item={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),type,title:ti};
+ if(type==='exam'&&examBuilder.length){
+  if(!ti){dErr=t('ct');dOk='';return render()}
+  item.questions=examBuilder.map(q=>({q:q.q,choices:q.choices,correct:q.correct}));
+ }else{
+  if(!ti||!/^https?:\/\//.test(u)){dErr=t('badurl');dOk='';return render()}
+  item.url=u;
+ }
+ abusy=true;dErr='';dOk='';render();
+ try{
+  await fs.collection('courses').doc(c.id).update({items:[...(c.items||[]),item]});
+  dOk=lg==='ar'?`تمت إضافة "${ti}" للكورس`:lg==='fr'?`« ${ti} » ajouté au cours`:`"${ti}" added to the course`;
+  examBuilder=[];eqDraft=blankEQ();itemDraft={title:'',url:''};
+ }catch(e){dOk='';dErr=(e&&(e.message||e.code))||t('connErr')}
+ abusy=false;render()}
+function dStu(){return db.users.map(u=>{const exCount=db.examResults.filter(r=>r.email===u.email).length;
+ if(!grantSel[u.id]||!db.courses.find(c=>c.id===grantSel[u.id]))grantSel[u.id]=(db.courses[0]&&db.courses[0].id)||'';
+ return `<div class="bx"><div style="display:flex;gap:12px;align-items:center"><div class="av2">${av(u,26)}</div><div><b>${esc(u.name)}</b><div style="color:var(--mut);font-size:13px">${t('g'+u.g)} · ${esc(u.age||'')} · ${esc(u.email)}</div><div style="font-size:13px">${t('sp')}: ${esc(u.phone||'')} | ${t('pp')}: ${esc(u.parent||'')}</div><div style="font-size:12px;color:var(--mut)">${t('lastActive')}: ${u.lastActive?fd(u.lastActive):'-'} · ${t('examsTaken')}: ${exCount}</div></div></div>
+ <div style="display:flex;gap:8px;margin-top:8px"><select id="gs_${u.id}" style="margin:0;flex:1" onchange="grantSel['${u.id}']=this.value">${db.courses.map(c=>`<option value="${c.id}" ${grantSel[u.id]===c.id?'selected':''}>${esc(c.title)}</option>`).join('')}</select><button class="c" onclick="grant('${u.id}')">${t('grant')}</button>${exCount?`<button class="c" onclick="dt='gr';grFilterEmail='${u.email}';render()">${t('viewGrades')}</button>`:''}</div></div>`}).join('')||`<p>${t('none')}</p>`}
+async function grant(uid){const u=db.users.find(x=>x.id===uid),cid=grantSel[uid],c=cid&&db.courses.find(x=>x.id===cid);if(!u||!c)return;
+ try{await fs.collection('payments').add({uid:u.id,email:u.email,name:u.name,phone:u.phone||'',cid:c.id,title:c.title,amount:c.price,m:'manual',ts:Date.now(),s:'a'})}catch(e){alert(t('connErr'))}}
+function dGr(){const list=grFilterEmail?db.examResults.filter(r=>r.email===grFilterEmail):db.examResults;
+ const header=grFilterEmail?`<div class="rw"><b>${esc(grFilterEmail)}</b><button class="c" onclick="grFilterEmail='';render()">${t('allStudents')}</button></div>`:'';
+ return header+(list.map(r=>`<div class="bx"><div class="rw"><span><b>${esc(r.name)}</b> — ${esc(r.courseTitle)} / ${esc(r.examTitle)}</span><span class="pr">${r.score}/${r.max}</span></div><small style="color:var(--mut)">${fd(r.ts)}</small>
+ <button class="c" onclick="toggleGrade('${r.id}')">${t('details')}</button>
+ ${expandedGrade===r.id?`<div style="margin-top:8px">${r.answers.map((a,i)=>`<div class="rw"><span>${i+1}. ${esc(a.q)}</span><span class="${a.ok?'ok':'no'}">${esc(a.chosen)}${a.ok?'':' → '+esc(a.correctText)}</span></div>`).join('')}</div>`:''}</div>`).join('')||`<p>${t('none')}</p>`)}
+function toggleGrade(id){expandedGrade=expandedGrade===id?null:id;render()}
+function dMsg(){return thr().map((a,i)=>`<div class="bx"><b>${esc(a[0].name)}</b> <small style="color:var(--mut)">${used(a[0].email)}/3</small><div class="chat sm">${a.map(m=>`<div class="bub ${m.from==='t'?'me':''}"><small>${m.from==='t'?t('teacher'):esc(m.name)} · ${fd(m.ts)}</small>${esc(m.text).replace(/\n/g,'<br>')}</div>`).join('')}</div><div class="rowin"><textarea id="rp${i}" rows="2" placeholder="${t('msgP')}"></textarea><button class="b" style="width:auto" onclick="reply(${i})">${I('send',16)}</button></div></div>`).join('')||`<p>${t('none')}</p>`}
+async function reply(i){const a=thr()[i],x=cl($('#rp'+i).value);if(!x)return;try{await fs.collection('messages').add({uid:a[0].uid||'',email:a[0].email,name:a[0].name,from:'t',text:x,ts:Date.now()})}catch(e){alert(t('connErr'))}}
+function dSet(){return `<div class="bx"><h4>${t('profile')}</h4><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px"><div class="av2">${av(me,40)}</div><label class="c" style="cursor:pointer;display:inline-flex;gap:6px;align-items:center">${I('camera',15)} ${t('photo')}<input type="file" accept="image/*" hidden onchange="setTeacherPhoto(this)"></label></div><input id="tn" value="${esc(db.teacherName)}" placeholder="${t('name')}"><textarea id="tbio" rows="2" placeholder="${t('hp')}">${esc(db.teacherBio||'')}</textarea><button class="b" onclick="saveTeacherProfile()">${t('save')}</button></div>
+ <div class="bx"><h4>${t('wal')}</h4><small>${t('wn')}</small><input id="w" dir="ltr" value="${esc(db.wallet)}"><small>${t('in')}</small><input id="i" dir="ltr" value="${esc(db.insta)}"><small>${t('aiUrl')}</small><input id="ai" dir="ltr" placeholder="https://your-worker.workers.dev" value="${esc(db.ai||'')}"><button class="b" onclick="saveSettings(this)">${t('save')}</button></div>`}
+async function setTeacherPhoto(inp){const f=inp.files[0];if(!f)return;try{const url=await uploadImage(f,`teacher/photo_${Date.now()}.jpg`,300);await fs.collection('teacherProfile').doc('main').set({photo:url},{merge:true})}catch(e){alert(t('connErr'))}}
+async function saveTeacherProfile(){try{await fs.collection('teacherProfile').doc('main').set({name:cl($('#tn').value),bio:cl($('#tbio').value)},{merge:true})}catch(e){alert(t('connErr'))}}
+async function saveSettings(btn){try{await fs.collection('settings').doc('main').set({wallet:cl($('#w').value),insta:cl($('#i').value),ai:cl($('#ai').value)},{merge:true});if(btn)btn.textContent='OK'}catch(e){alert(t('connErr'))}}
+
+/* ---------------- pay ---------------- */
+function openPay(id){pz=db.courses.find(c=>c.id===id);pmth='vc';payFile=null;drawPay();$('#ov').style.display='flex'}
+function drawPay(){$('#md').innerHTML=`<h3 style="margin-top:0">${t('pay')}: ${esc(pz.title)}</h3><div class="pr">${pz.price} ${t('egp')}</div>
+ <div class="pm">${['vc','ip'].map(m=>`<button class="${pmth===m?'on':''}" onclick="pmth='${m}';drawPay()">${t(m)}</button>`).join('')}</div><small>${t('send')}</small><div class="nm">${esc(pmth==='vc'?db.wallet:db.insta)}</div>
+ <small>${t('proof')}</small><input type="file" id="pf" accept="image/*" onchange="payFile=this.files[0]||null;drawPay()">${payFile?`<small style="color:var(--ok,#2ecc71)">✓ ${esc(payFile.name)}</small>`:''}<button class="b" ${payBusy?'disabled':''} onclick="sendPay()">${payBusy?t('wait'):t('conf')}</button><button class="b s" onclick="closeM()">${t('cancel')}</button>`}
+async function sendPay(){if(payBusy)return;const f=payFile;if(!f)return alert(t('pfirst'));
+ payBusy=true;drawPay();
+ try{const url=await uploadImage(f,`payments/${me.uid}_${Date.now()}.jpg`,900);await fs.collection('payments').add({uid:me.uid,email:me.email,name:me.name,phone:me.phone||'',cid:pz.id,title:pz.title,amount:pz.price,m:pmth,img:url,ts:Date.now(),s:'p'});payFile=null;payBusy=false;closeM();alert(t('sent'))}catch(e){payBusy=false;alert((e&&(e.message||e.code))||t('connErr'));drawPay()}}
+
+/* ---------------- support ---------------- */
+function openSup(){const m='ghhbvvbnt@gmail.com';showM(`<h3 style="margin-top:0">${t('supT')}</h3><p style="color:var(--mut)">${t('supS')}</p><div class="nm">${m}</div><button class="b" onclick="cpy('${m}',this)">${I('copy',16)} ${t('copy')}</button><a class="b s" href="https://mail.google.com/mail/?view=cm&fs=1&to=${m}" target="_blank" rel="noopener">${I('mail',16)} ${t('gmail')}</a><a class="b s" href="mailto:${m}">${t('mailapp')}</a><button class="b s" onclick="closeM()">${t('close')}</button>`)}
+function cpy(x,b){const d=()=>{b.textContent=t('copied')};function fb(){const a=document.createElement('textarea');a.value=x;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();d()}
+ try{navigator.clipboard.writeText(x).then(d,fb)}catch(e){fb()}}
+
+/* language select handler (kept outside render, wired to element in HTML) */
+function setLang(v){lg=v;localStorage.setItem('np_lang',v);render()}
+window.addEventListener('unhandledrejection',ev=>{console.error(ev.reason)});
+render();
+</script></body></html>
