@@ -70,6 +70,20 @@ h3.sec{font-size:24px;text-align:center;margin:34px 0 18px}
 .nm{background:var(--bg);padding:12px;border-radius:10px;text-align:center;font-size:18px;direction:ltr;margin-bottom:10px;color:var(--a);font-weight:700}
 .ok{color:#2fd27a}.wt{color:#e5a70b}.no{color:#e0445a}
 @media(max-width:760px){.hero{grid-template-columns:1fr}.dock button,.dock a{padding:8px 10px}}
+
+.vp{position:fixed;inset:0;z-index:50;background:var(--bg);color:var(--fg);display:none;flex-direction:column;overflow-y:auto;padding-top:env(safe-area-inset-top,0px)}
+.vp.on{display:flex}.vp .vh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bg);z-index:2}
+.vp .vh b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vp .vb{max-width:1000px;width:100%;margin:auto;padding:12px;display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:860px){.vp .vb{grid-template-columns:2fr 1fr;align-items:start}}
+.vp .vs{position:relative;aspect-ratio:16/9;background:#000;border-radius:16px;overflow:hidden}
+.vp .vs iframe,.vp .vs video,.vp .vs #vy{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vp .wm{position:absolute;z-index:3;pointer-events:none;color:#fff;opacity:.18;font-size:12px;font-family:monospace;top:10%;inset-inline-start:6%;transition:all 2s}
+.vp .vc{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.vp .vc button,.vp .vc select{flex:1;min-width:80px;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--fg);font-size:13px;font-weight:600}
+.vp .vl{background:var(--card);border:1px solid var(--bd);border-radius:16px;max-height:60vh;overflow-y:auto}
+.vp .vi{display:flex;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:14px}.vp .vi.on{background:var(--in);color:var(--a);font-weight:700}
+.vp .vi i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}.vp .vi.dn i{background:#2fd27a;color:#fff;border-color:#2fd27a}
+.vp .pg{height:4px;background:var(--bd);border-radius:9px;margin-top:10px;overflow:hidden}.vp .pg div{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));width:0}
 </style></head><body>
 <header><div class="brand"><span class="lg" id="logo"></span><span>Not <span class="g">Programming</span><small id="tag"></small></span></div>
 <div class="tools"><select class="tb" id="lg" onchange="setLang(this.value)"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option></select>
@@ -187,7 +201,7 @@ const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>re
 
 /* ---- طبقة توافق: بتحاكي واجهة Firebase (auth / fs / storage) لكن شغالة فعلياً بـ Supabase ----
    الهدف إن باقي كود الموقع (render/state/UI) يفضل زي ما هو بالظبط من غير أي تعديل ---- */
-const TBL={courses:'courses',settings:'settings',teacherProfile:'teacher_profile',users:'profiles',payments:'payments',editRequests:'edit_requests',messages:'messages',examResults:'exam_results'};
+const TBL={courses:'courses',settings:'settings',teacherProfile:'teacher_profile',users:'profiles',payments:'payments',editRequests:'edit_requests',messages:'messages',examResults:'exam_results',courseItems:'course_items'};
 function normUser(u){if(u&&!u.uid)u.uid=u.id;return u}
 function mapAuthErr(err){const m=((err&&err.message)||'').toLowerCase();
  if(m.includes('already registered')||m.includes('already in use'))return{code:'auth/email-already-in-use',message:err.message};
@@ -336,19 +350,22 @@ auth.onAuthStateChanged(async user=>{
  }catch(e){er=t('connErr')}
  render();
 });
+function mergeItems(){db.cItems=db.cItems||[];db.courses.forEach(c=>{c.items=db.cItems.filter(i=>i.cid===c.id)})}
+async function loadItems(){try{const s=await fs.collection('courseItems').orderBy('createdAt','asc').get();db.cItems=s.docs.map(d=>({id:d.id,...d.data()}));mergeItems();render()}catch(e){}}
 function subscribeAll(){
  const onErr=e=>{gErr=(e&&e.message)||t('connErr');render()};
- unsubs.push(fs.collection('courses').orderBy('createdAt','desc').onSnapshot(s=>{db.courses=s.docs.map(d=>({id:d.id,...d.data(),items:d.data().items||[]}));gErr='';render()},onErr));
+ unsubs.push(fs.collection('courses').orderBy('createdAt','desc').onSnapshot(s=>{db.courses=s.docs.map(d=>({id:d.id,...d.data(),items:[]}));mergeItems();gErr='';render()},onErr));
+ unsubs.push(fs.collection('courseItems').onSnapshot(()=>loadItems(),onErr));
  unsubs.push(fs.collection('settings').doc('main').onSnapshot(s=>{const d=s.data()||{};db.wallet=d.wallet||'01027944588';db.insta=d.insta||'mohammed577y@instapay';db.ai=d.ai||'';render()},onErr));
  unsubs.push(fs.collection('teacherProfile').doc('main').onSnapshot(s=>{const d=s.data()||{};db.teacherName=d.name||'Mohammed Yasser';db.teacherPhoto=d.photo||'';db.teacherBio=d.bio||'';if(me&&me.role==='teacher'){me.name=db.teacherName;me.photo=db.teacherPhoto}render()},onErr));
  if(me.role==='teacher'){
   unsubs.push(fs.collection('users').onSnapshot(s=>{db.users=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
-  unsubs.push(fs.collection('payments').orderBy('ts','desc').onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
+  unsubs.push(fs.collection('payments').orderBy('ts','desc').onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()}));loadItems();render()},onErr));
   unsubs.push(fs.collection('editRequests').orderBy('ts','desc').onSnapshot(s=>{db.reqs=s.docs.map(d=>({id:d.id,...d.data()}));render()},onErr));
   unsubs.push(fs.collection('messages').onSnapshot(s=>{db.msgs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);render()},onErr));
   unsubs.push(fs.collection('examResults').onSnapshot(s=>{db.examResults=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
  }else{
-  unsubs.push(fs.collection('payments').where('email','==',me.email).onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
+  unsubs.push(fs.collection('payments').where('email','==',me.email).onSnapshot(s=>{db.payments=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);loadItems();render()},onErr));
   unsubs.push(fs.collection('editRequests').where('email','==',me.email).onSnapshot(s=>{db.reqs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
   unsubs.push(fs.collection('messages').where('email','==',me.email).onSnapshot(s=>{db.msgs=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.ts-b.ts);render()},onErr));
   unsubs.push(fs.collection('examResults').where('email','==',me.email).onSnapshot(s=>{db.examResults=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.ts-a.ts);render()},onErr));
@@ -370,7 +387,7 @@ function vCourses(){
  const chip=(on,f,l2)=>`<button class="c ${on?'on':''}" onclick="${f}">${l2}</button>`;
  return `<div class="ch">${['all',0,1,2].map(g=>chip(fg==g,`fg='${g}';render()`,g==='all'?t('all'):t('g'+g))).join('')}</div>
  <div class="ch">${chip(ft==='all',`ft='all';render()`,t('all'))}${TR.map(([n])=>chip(ft===n,`ft='${n}';render()`,n)).join('')}</div>
- <div class="grid">${l.map(c=>{const s=status(c);return `<div class="cd cs">${cover(c)}<span class="tg">${t('g'+c.g)}</span><span class="tg">${esc(c.tr)}</span><h4>${esc(c.title)}</h4>${c.desc?`<p class="ds">${esc(c.desc)}</p>`:''}<small style="color:var(--mut)">${(c.items||[]).length} ${t('items')}</small><div class="pr">${c.price?c.price+' '+t('egp'):t('free')}</div>${s==='B'||s==='P'?`<small class="no" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">${I('lock',14)} ${t('locked')}</small>`:''}
+ <div class="grid">${l.map(c=>{const s=status(c);return `<div class="cd cs">${cover(c)}<span class="tg">${t('g'+c.g)}</span><span class="tg">${esc(c.tr)}</span><h4>${esc(c.title)}</h4>${c.desc?`<p class="ds">${esc(c.desc)}</p>`:''}<small style="color:var(--mut)">${(c.icount||(c.items||[]).length)} ${t('items')}</small><div class="pr">${c.price?c.price+' '+t('egp'):t('free')}</div>${s==='B'||s==='P'?`<small class="no" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">${I('lock',14)} ${t('locked')}</small>`:''}
  ${s==='O'||s==='T'?`<button class="b" onclick="openC('${c.id}')">${I('play',15)} ${t('open')}</button>`:s==='P'?`<button class="b s" disabled>${I('clock',16)} ${t('pend')}</button>`:`<button class="b" onclick="openPay('${c.id}')">${t('buy')}</button>`}
  ${s==='T'?`<button class="b s no" onclick="delC('${c.id}')">${t('del')}</button>`:''}</div>`}).join('')||`<p>${t('none')}</p>`}</div>`}
 function openC(id){const c=db.courses.find(x=>x.id===id),s=status(c);if(s==='O'||s==='T'){cur=id;go('course')}else openPay(id)}
@@ -384,8 +401,8 @@ function itemCard(c,it){
   ${res?`<div class="pr">${res.score}/${res.max}</div><button class="b s" onclick="reviewExam('${res.id}')">${t('review')}</button>`:`<button class="b" onclick="startExam('${c.id}','${it.id}')">${t('startExam')}</button>`}
   ${isT()?`<button class="b s no" onclick="delI('${c.id}','${it.id}')">${t('del')}</button>`:''}</div>`;
  }
- return `<div class="cd"><span class="tg">${t(it.type)}</span><div class="mono" style="margin-top:8px">${I(it.type,22)}</div><h4>${esc(it.title)}</h4><a class="b" href="${esc(it.url||'#')}" target="_blank" rel="noopener">${t(it.type==='video'?'watch':it.type==='pdf'?'openPdf':'startExam')}</a>${isT()?`<button class="b s no" onclick="delI('${c.id}','${it.id}')">${t('del')}</button>`:''}</div>`}
-async function delI(cid,iid){const c=db.courses.find(x=>x.id===cid);if(!c)return;try{await fs.collection('courses').doc(cid).update({items:(c.items||[]).filter(i=>i.id!==iid)})}catch(e){alert(t('connErr'))}}
+ return `<div class="cd"><span class="tg">${t(it.type)}</span><div class="mono" style="margin-top:8px">${I(it.type,22)}</div><h4>${esc(it.title)}</h4>${it.type==='video'?`<button class="b" onclick="playV('${c.id}','${it.id}')">${t('watch')}${vDone(it.id)?' ✓':''}</button>`:`<a class="b" href="${esc(it.url||'#')}" target="_blank" rel="noopener">${t(it.type==='pdf'?'openPdf':'startExam')}</a>`}${isT()?`<button class="b s no" onclick="delI('${c.id}','${it.id}')">${t('del')}</button>`:''}</div>`}
+async function delI(cid,iid){const c=db.courses.find(x=>x.id===cid);if(!c)return;try{await fs.collection('courseItems').doc(iid).delete()}catch(e){alert(t('connErr'))}}
 async function delC(id){if(!confirm('?'))return;try{await fs.collection('courses').doc(id).delete()}catch(e){alert(t('connErr'))}}
 
 /* ---------------- exam taking ---------------- */
@@ -460,7 +477,7 @@ function dCrs(){const o=(a,sel)=>a.map(([v,l])=>`<option value="${esc(v)}" ${Str
  ${itype==='exam'?examBuilderUI():''}
  <input id="iu" dir="ltr" placeholder="${itype==='exam'?t('examLinkOptional'):t('itemUrl')}" value="${esc(itemDraft.url)}" oninput="itemDraft.url=this.value">
  <button class="b" ${abusy?'disabled':''} onclick="addI()">${abusy?t('wait'):t('addToCourse')}</button></div>
- <div class="bx">${db.courses.length?db.courses.map(c=>`<div class="rw"><span>${esc(c.title)} <small style="color:var(--mut)">(${(c.items||[]).length})</small></span><span><button class="c" onclick="openC('${c.id}')">${t('open')}</button> <button class="c no" onclick="delC('${c.id}')">${t('del')}</button></span></div>`).join(''):`<small style="color:var(--mut)">${t('noItems')}</small>`}</div>`}
+ <div class="bx">${db.courses.length?db.courses.map(c=>`<div class="rw"><span>${esc(c.title)} <small style="color:var(--mut)">(${(c.icount||(c.items||[]).length)})</small></span><span><button class="c" onclick="openC('${c.id}')">${t('open')}</button> <button class="c no" onclick="delC('${c.id}')">${t('del')}</button></span></div>`).join(''):`<small style="color:var(--mut)">${t('noItems')}</small>`}</div>`}
 function examBuilderUI(){
  return `<div class="bx" style="background:var(--bg)"><small style="color:var(--mut)">${t('examBuilder')}</small>
  <input id="eq" placeholder="${t('qText')}" value="${esc(eqDraft.q)}" oninput="eqDraft.q=this.value">
@@ -499,7 +516,7 @@ async function addI(){if(abusy)return;
  }
  abusy=true;dErr='';dOk='';render();
  try{
-  await fs.collection('courses').doc(c.id).update({items:[...(c.items||[]),item]});
+  await fs.collection('courseItems').add({id:item.id,cid:c.id,type:item.type,title:item.title,url:item.url,questions:item.questions,createdAt:Date.now()});
   dOk=lg==='ar'?`تمت إضافة "${ti}" للكورس`:lg==='fr'?`« ${ti} » ajouté au cours`:`"${ti}" added to the course`;
   examBuilder=[];eqDraft=blankEQ();itemDraft={title:'',url:''};
  }catch(e){dOk='';dErr=(e&&(e.message||e.code))||t('connErr')}
@@ -542,4 +559,34 @@ function cpy(x,b){const d=()=>{b.textContent=t('copied')};function fb(){const a=
 function setLang(v){lg=v;localStorage.setItem('np_lang',v);render()}
 window.addEventListener('unhandledrejection',ev=>{console.error(ev.reason)});
 render();
-</script></body></html>
+</script>
+<script>
+/* ===== مشغّل الفيديوهات (YouTube + mp4) ===== */
+const VT={ar:{prev:'السابق',next:'التالي',sp:'السرعة',list:'قائمة الدروس',yt:'فتح في يوتيوب',done:'تمت المشاهدة'},en:{prev:'Previous',next:'Next',sp:'Speed',list:'Lessons',yt:'Open on YouTube',done:'Watched'},fr:{prev:'Préc.',next:'Suivant',sp:'Vitesse',list:'Leçons',yt:'Ouvrir sur YouTube',done:'Vu'}};
+const vt=k=>(VT[lg]||VT.ar)[k];
+const vKey=id=>'npv:'+((me&&me.email)||'')+':'+id;
+const vGet=id=>{try{return JSON.parse(localStorage.getItem(vKey(id)))||{}}catch(e){return{}}};
+const vSet=(id,o)=>{try{localStorage.setItem(vKey(id),JSON.stringify({...vGet(id),...o}))}catch(e){}};
+function vDone(id){return !!vGet(id).done}
+function ytId(u){u=String(u||'');const m=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([\w-]{11})/);return m?m[1]:/^[\w-]{11}$/.test(u)?u:''}
+let VP={cid:null,iid:null,yt:null,timer:null,list:[]};
+function vMount(){if(document.getElementById('vp'))return;const d=document.createElement('div');d.id='vp';d.className='vp';document.body.appendChild(d)}
+function ytApi(){return new Promise(r=>{if(window.YT&&YT.Player)return r();const p=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{p&&p();r()};if(!document.getElementById('ytapi')){const s=document.createElement('script');s.id='ytapi';s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s)}})}
+function playV(cid,iid){const c=db.courses.find(x=>x.id===cid);if(!c)return;vMount();VP.cid=cid;VP.list=(c.items||[]).filter(i=>i.type==='video');VP.iid=iid;document.getElementById('vp').classList.add('on');document.body.style.overflow='hidden';vDraw();vLoad()}
+function vCur(){return VP.list.find(i=>i.id===VP.iid)}
+function vDraw(){const it=vCur();if(!it)return;const i=VP.list.indexOf(it);
+document.getElementById('vp').innerHTML=`<div class="vh"><button class="c" onclick="vClose()">✕</button><b>${esc(it.title)}</b></div><div class="vb"><div><div class="vs" id="vs"><div class="wm" id="wm">${esc((me&&me.email)||'')}</div><div id="vy"></div></div><div class="pg"><div id="vpg"></div></div>
+<div class="vc"><button onclick="vGo(-1)" ${i<=0?'disabled':''}>${vt('prev')}</button><select id="vsp" onchange="vSpeed(this.value)" aria-label="${vt('sp')}">${[.75,1,1.25,1.5,2].map(s=>`<option value="${s}" ${s==(+localStorage.getItem('npv_sp')||1)?'selected':''}>${s}x</option>`).join('')}</select><button onclick="vGo(1)" ${i>=VP.list.length-1?'disabled':''}>${vt('next')}</button></div>
+<div class="vc"><button onclick="window.open('${esc(it.url)}','_blank','noopener')">${vt('yt')}</button></div></div>
+<div><h4 style="margin:0 0 8px">${vt('list')} (${VP.list.length})</h4><div class="vl">${VP.list.map((x,n)=>`<div class="vi ${x.id===VP.iid?'on':''} ${vDone(x.id)?'dn':''}" onclick="VP.iid='${x.id}';vDraw();vLoad()"><i>${vDone(x.id)?'✓':n+1}</i><span>${esc(x.title)}</span></div>`).join('')}</div></div></div>`}
+async function vLoad(){clearInterval(VP.timer);if(VP.yt&&VP.yt.destroy){try{VP.yt.destroy()}catch(e){}}VP.yt=null;
+const it=vCur(),host=document.getElementById('vy');if(!it||!host)return;const id=ytId(it.url),sp=+localStorage.getItem('npv_sp')||1,st=vGet(it.id);
+if(id){await ytApi();if(!document.getElementById('vy'))return;VP.yt=new YT.Player('vy',{videoId:id,playerVars:{rel:0,modestbranding:1,playsinline:1,start:st.t&&!st.done?Math.floor(st.t):0},events:{onReady:e=>{e.target.setPlaybackRate(sp)},onStateChange:e=>{if(e.data===0){vSet(it.id,{done:1,t:0});vGo(1,true)}}}});
+VP.timer=setInterval(()=>{try{const p=VP.yt,t=p.getCurrentTime(),d=p.getDuration();if(!d)return;document.getElementById('vpg').style.width=(t/d*100)+'%';if(p.getPlayerState()===1){vSet(it.id,{t});if(t/d>.9&&!vDone(it.id)){vSet(it.id,{done:1});const r=document.querySelectorAll('.vp .vi')[VP.list.indexOf(it)];r&&r.classList.add('dn')}}const w=document.getElementById('wm');if(w){w.style.top=(8+Math.random()*75)+'%';w.style.insetInlineStart=(5+Math.random()*60)+'%'}}catch(e){}},4000)}
+else{host.outerHTML=`<video id="vy" src="${esc(it.url)}" controls playsinline controlsList="nodownload" style="position:absolute;inset:0;width:100%;height:100%"></video>`;const v=document.getElementById('vy');v.playbackRate=sp;v.currentTime=st.t||0;v.ontimeupdate=()=>{vSet(it.id,{t:v.currentTime});document.getElementById('vpg').style.width=(v.currentTime/v.duration*100)+'%'};v.onended=()=>{vSet(it.id,{done:1,t:0});vGo(1,true)}}}
+function vSpeed(s){localStorage.setItem('npv_sp',s);try{VP.yt&&VP.yt.setPlaybackRate(+s)}catch(e){}const v=document.querySelector('video#vy');if(v)v.playbackRate=+s}
+function vGo(d,auto){const i=VP.list.indexOf(vCur())+d;if(i<0||i>=VP.list.length){if(auto)vDraw();return}VP.iid=VP.list[i].id;vDraw();vLoad()}
+function vClose(){clearInterval(VP.timer);try{VP.yt&&VP.yt.destroy()}catch(e){}VP.yt=null;const p=document.getElementById('vp');p.classList.remove('on');p.innerHTML='';document.body.style.overflow='';if(typeof render==='function')render()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('vp')?.classList.contains('on'))vClose()});
+</script>
+</body></html>
