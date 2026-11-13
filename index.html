@@ -416,8 +416,8 @@ async function submitExam(){const c=db.courses.find(x=>x.id===examState.cid);con
  if(examAns.filter(a=>a!==undefined&&a!==null).length<it.questions.length)return alert(t('answerAll'));
  let score=0;const answers=it.questions.map((q,i)=>{const ci=examAns[i],ok=ci===q.correct;if(ok)score++;return{q:q.q,chosen:q.choices[ci],ok,correctText:q.choices[q.correct]}});
  try{
-  await fs.collection('examResults').add({uid:me.uid,email:me.email,name:me.name,courseId:c.id,courseTitle:c.title,itemId:it.id,examTitle:it.title,answers,score,max:it.questions.length,ts:Date.now()});
-  examAns=[];sec='course';render();alert(`${t('yourScore')}: ${score}/${it.questions.length}`);
+  const ref=await fs.collection('examResults').add({uid:me.uid,email:me.email,name:me.name,courseId:c.id,courseTitle:c.title,itemId:it.id,examTitle:it.title,answers,score,max:it.questions.length,ts:Date.now()});
+  autoNotify(ref.id);examAns=[];sec='course';render();alert(`${t('yourScore')}: ${score}/${it.questions.length}`);
  }catch(e){alert(t('connErr'))}}
 function reviewExam(id){const r=db.examResults.find(x=>x.id===id);if(!r)return;showM(`<h3 style="margin-top:0">${esc(r.examTitle)} — ${r.score}/${r.max}</h3>${r.answers.map((a,i)=>`<div class="rw"><span>${i+1}. ${esc(a.q)}</span><span class="${a.ok?'ok':'no'}">${esc(a.chosen)}${a.ok?'':' → '+esc(a.correctText)}</span></div>`).join('')}<button class="b s" onclick="closeM()">${t('close')}</button>`)}
 
@@ -530,7 +530,7 @@ async function grant(uid){const u=db.users.find(x=>x.id===uid),cid=grantSel[uid]
 function dGr(){const list=grFilterEmail?db.examResults.filter(r=>r.email===grFilterEmail):db.examResults;
  const header=grFilterEmail?`<div class="rw"><b>${esc(grFilterEmail)}</b><button class="c" onclick="grFilterEmail='';render()">${t('allStudents')}</button></div>`:'';
  return header+(list.map(r=>`<div class="bx"><div class="rw"><span><b>${esc(r.name)}</b> — ${esc(r.courseTitle)} / ${esc(r.examTitle)}</span><span class="pr">${r.score}/${r.max}</span></div><small style="color:var(--mut)">${fd(r.ts)}</small>
- <button class="c" onclick="toggleGrade('${r.id}')">${t('details')}</button>
+ <button class="c" onclick="toggleGrade('${r.id}')">${t('details')}</button><button class="c" onclick="parentMsg('${r.id}','wa')">WhatsApp 👪</button><button class="c" onclick="parentMsg('${r.id}','sms')">SMS 👪</button>
  ${expandedGrade===r.id?`<div style="margin-top:8px">${r.answers.map((a,i)=>`<div class="rw"><span>${i+1}. ${esc(a.q)}</span><span class="${a.ok?'ok':'no'}">${esc(a.chosen)}${a.ok?'':' → '+esc(a.correctText)}</span></div>`).join('')}</div>`:''}</div>`).join('')||`<p>${t('none')}</p>`)}
 function toggleGrade(id){expandedGrade=expandedGrade===id?null:id;render()}
 function dMsg(){return thr().map((a,i)=>`<div class="bx"><b>${esc(a[0].name)}</b> <small style="color:var(--mut)">${used(a[0].email)}/3</small><div class="chat sm">${a.map(m=>`<div class="bub ${m.from==='t'?'me':''}"><small>${m.from==='t'?t('teacher'):esc(m.name)} · ${fd(m.ts)}</small>${esc(m.text).replace(/\n/g,'<br>')}</div>`).join('')}</div><div class="rowin"><textarea id="rp${i}" rows="2" placeholder="${t('msgP')}"></textarea><button class="b" style="width:auto" onclick="reply(${i})">${I('send',16)}</button></div></div>`).join('')||`<p>${t('none')}</p>`}
@@ -588,5 +588,17 @@ function vSpeed(s){localStorage.setItem('npv_sp',s);try{VP.yt&&VP.yt.setPlayback
 function vGo(d,auto){const i=VP.list.indexOf(vCur())+d;if(i<0||i>=VP.list.length){if(auto)vDraw();return}VP.iid=VP.list[i].id;vDraw();vLoad()}
 function vClose(){clearInterval(VP.timer);try{VP.yt&&VP.yt.destroy()}catch(e){}VP.yt=null;const p=document.getElementById('vp');p.classList.remove('on');p.innerHTML='';document.body.style.overflow='';if(typeof render==='function')render()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('vp')?.classList.contains('on'))vClose()});
+</script>
+
+<script>
+/* ===== إرسال الدرجة لولي الأمر ===== */
+const PMSG={ar:'مرحبًا، نتيجة الطالب/ة {name} في امتحان "{exam}" (كورس {course}): {score} من {max}. — Not Programming',en:'Hello, {name} scored {score}/{max} in "{exam}" ({course}). — Not Programming',fr:'Bonjour, {name} a obtenu {score}/{max} à "{exam}" ({course}). — Not Programming'};
+function pPhone(p){p=String(p||'').replace(/[^\d+]/g,'');if(p[0]==='+')return p.slice(1);if(p.startsWith('00'))return p.slice(2);if(p[0]==='0')return '20'+p.slice(1);return p}
+function pText(r){const v={name:r.name,exam:r.examTitle,course:r.courseTitle,score:r.score,max:r.max};return (PMSG[lg]||PMSG.ar).replace(/\{(\w+)\}/g,(_,k)=>v[k])}
+function parentMsg(id,ch){const r=db.examResults.find(x=>x.id===id),u=r&&db.users.find(x=>x.email===r.email),ph=pPhone(u&&u.parent);
+if(!ph)return alert(lg==='en'?'No parent phone for this student':'مفيش رقم ولي أمر للطالب ده');const x=encodeURIComponent(pText(r));
+window.open(ch==='wa'?`https://wa.me/${ph}?text=${x}`:`sms:+${ph}?body=${x}`,'_blank')}
+async function autoNotify(id){try{if(!db.ai)return;const s=(await sb.auth.getSession()).data.session;if(!s)return;
+fetch(db.ai.replace(/\/$/,'')+'/notify',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+s.access_token},body:JSON.stringify({id})}).catch(()=>{})}catch(e){}}
 </script>
 </body></html>
