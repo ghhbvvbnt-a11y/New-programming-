@@ -85,57 +85,53 @@ h3.sec{font-size:24px;text-align:center;margin:34px 0 18px}
 .vp .vi i{font-style:normal;width:24px;height:24px;border-radius:50%;background:var(--bg);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}.vp .vi.dn i{background:#2fd27a;color:#fff;border-color:#2fd27a}
 .vp .pg{height:4px;background:var(--bd);border-radius:9px;margin-top:10px;overflow:hidden}.vp .pg div{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));width:0}
 
-/* ============ Liquid Glass theme ============ */
-:root{--bg:#e8eeff;--fg:#12162b;--mut:#5d6785;--card:rgba(255,255,255,.46);--bd:rgba(255,255,255,.7);--in:rgba(255,255,255,.5);--a:#6a4dff;--a2:#18a0ff;
---glass-sh:0 10px 34px rgba(60,70,160,.16),inset 0 1.5px 1px rgba(255,255,255,.9),inset 0 -1px 1px rgba(255,255,255,.25),inset 0 0 18px rgba(255,255,255,.25);--blob:.6}
-:root[data-theme="dark"]{--bg:#06070e;--fg:#f2f4fb;--mut:#9aa3bd;--card:rgba(255,255,255,.07);--bd:rgba(255,255,255,.16);--in:rgba(255,255,255,.06);
---glass-sh:0 12px 36px rgba(0,0,0,.45),inset 0 1.5px 1px rgba(255,255,255,.22),inset 0 -1px 1px rgba(255,255,255,.04),inset 0 0 20px rgba(255,255,255,.04);--blob:.5}
+/* ============ Liquid Glass — classic palette ============ */
+:root{--bg:#ece9e2;--fg:#1f2430;--mut:#666b78;--card:rgba(255,255,255,.5);--bd:rgba(255,255,255,.75);--in:rgba(255,255,255,.55);--a:#243b5a;--a2:#3b5a82;--sh1:transparent;--sh2:transparent;
+--glass-sh:0 8px 28px rgba(40,50,70,.12),inset 0 1.5px 1px rgba(255,255,255,.9),inset 0 -1px 1px rgba(255,255,255,.25);--blob:.5}
+:root[data-theme="dark"]{--bg:#101318;--fg:#e8e6e0;--mut:#9a9da6;--card:rgba(255,255,255,.06);--bd:rgba(255,255,255,.14);--in:rgba(255,255,255,.05);--a:#9bb4d3;--a2:#7f9bc0;
+--glass-sh:0 10px 30px rgba(0,0,0,.4),inset 0 1.5px 1px rgba(255,255,255,.2),inset 0 -1px 1px rgba(255,255,255,.03);--blob:.4}
 html{background:var(--bg)}
-body{background:transparent;background-image:none;font-family:-apple-system,'SF Pro Display','Segoe UI',Tahoma,Arial,sans-serif;letter-spacing:.1px;-webkit-font-smoothing:antialiased}
+body{background:transparent;background-image:none;font-family:'Segoe UI',Tahoma,Arial,sans-serif;-webkit-font-smoothing:antialiased}
 body::before{content:"";position:fixed;inset:-25%;z-index:-1;pointer-events:none;opacity:var(--blob);
-background:radial-gradient(circle at 18% 22%,#7b5cff 0,transparent 36%),radial-gradient(circle at 82% 18%,#19b4ff 0,transparent 34%),radial-gradient(circle at 72% 82%,#ff6ec7 0,transparent 36%),radial-gradient(circle at 14% 80%,#ffb347 0,transparent 30%);animation:lgd 26s ease-in-out infinite alternate}
-@keyframes lgd{to{transform:translate3d(4%,3%,0) rotate(8deg) scale(1.08)}}
+background:radial-gradient(circle at 18% 22%,#8d9db5 0,transparent 36%),radial-gradient(circle at 82% 20%,#c9b99a 0,transparent 34%),radial-gradient(circle at 72% 82%,#9fae9c 0,transparent 36%),radial-gradient(circle at 14% 80%,#b9a7a0 0,transparent 30%);animation:lgd 30s ease-in-out infinite alternate}
+@keyframes lgd{to{transform:translate3d(3%,2%,0) rotate(6deg) scale(1.06)}}
 @media(prefers-reduced-motion:reduce){body::before,.lan{animation:none}}
-/* glass surfaces */
-.cd,.bx,.au,.id,.md,.dock,.tb,.c,.bdg,.bub,.vp .vl,.vp .vc button,.vp .vc select,.mq,.th{
--webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);background:var(--card);border:1px solid var(--bd)}
+h1,h2,h3.sec,.brand b{font-family:Georgia,'Times New Roman',serif;font-weight:700}
+.g{background:none;-webkit-text-fill-color:currentColor;color:var(--a)}
+.cd,.bx,.au,.id,.md,.dock,.tb,.c,.bdg,.bub,.vp .vl,.vp .vc button,.vp .vc select{background:var(--card);border:1px solid var(--bd);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
 .cd,.bx,.au,.id,.md,.dock,.vp .vl{box-shadow:var(--glass-sh)}
-.au{border-radius:32px;padding:32px 26px}
-.au input,.au select,.bx input,.bx select,.md input,.md select,textarea{background:var(--in);border:1px solid var(--bd);box-shadow:inset 0 2px 6px rgba(0,0,0,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:14px;transition:.2s}
-.au input:focus,.au select:focus,.bx input:focus,.bx select:focus,.md input:focus,textarea:focus{outline:0;border-color:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 22%,transparent),inset 0 2px 6px rgba(0,0,0,.06)}
+.cd,.bx,.id,.md,.vp .vl{border-radius:20px}.au{border-radius:26px;padding:30px 26px}
+.cd{transition:transform .3s,box-shadow .3s}.cd:hover{transform:translateY(-3px)}.cd:before{display:none}
+.cd:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.3),rgba(255,255,255,0) 40%);pointer-events:none;opacity:.55}
+.au input,.au select,.bx input,.bx select,.md input,.md select,textarea{background:var(--in);border:1px solid var(--bd);box-shadow:inset 0 2px 5px rgba(0,0,0,.06);border-radius:12px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.au input:focus,.au select:focus,.bx input:focus,.bx select:focus,.md input:focus,textarea:focus{outline:0;border-color:var(--a)}
 .ic{background:var(--card);border:1px solid var(--bd);box-shadow:var(--glass-sh)}
-/* glossy buttons */
-.nb,.b,.bt{position:relative;overflow:hidden;color:#fff;border:1px solid rgba(255,255,255,.35);background:linear-gradient(135deg,var(--a),var(--a2));box-shadow:0 8px 22px color-mix(in srgb,var(--a) 38%,transparent),inset 0 1.5px 1px rgba(255,255,255,.55),inset 0 -2px 4px rgba(0,0,0,.12);transition:transform .2s,box-shadow .2s}
-.nb:before,.b:before,.bt:before{content:"";position:absolute;inset:0 0 50%;background:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,0));pointer-events:none}
-.nb:active,.b:active,.bt:active{transform:scale(.97);box-shadow:0 3px 10px color-mix(in srgb,var(--a) 30%,transparent),inset 0 1px 1px rgba(255,255,255,.4)}
-.b.s,.bt.s{color:var(--fg);background:var(--card);border:1px solid var(--bd);box-shadow:var(--glass-sh);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}.b.s:before,.bt.s:before{display:none}
-.bt.r{color:#e0445a;background:rgba(224,68,90,.14);box-shadow:none}.bt.r:before{display:none}
-.c.on{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border-color:rgba(255,255,255,.4);box-shadow:0 6px 16px color-mix(in srgb,var(--a) 35%,transparent),inset 0 1px 1px rgba(255,255,255,.5)}
-.bub.me{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border-color:rgba(255,255,255,.3)}
-/* cards */
-.cd{border-radius:24px;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}.cd:hover{transform:translateY(-4px) scale(1.01)}
-.cd:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,0) 40%);pointer-events:none;opacity:.6}
-.cvi{border-radius:18px}.pr{color:var(--a)}
-/* floating glass dock */
-.dock{border-radius:30px;padding:7px;gap:2px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-.dock button,.dock a{border-radius:22px;transition:.25s;color:var(--mut)}
-.dock .on{color:var(--fg);background:rgba(255,255,255,.35);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.8),0 4px 14px rgba(0,0,0,.12)}
-:root[data-theme="dark"] .dock .on{background:rgba(255,255,255,.14);box-shadow:inset 0 1px 1px rgba(255,255,255,.3),0 4px 14px rgba(0,0,0,.35)}
-/* header + hero */
-.lg,.mono{border:1px solid rgba(255,255,255,.4);box-shadow:0 8px 22px color-mix(in srgb,var(--a) 40%,transparent),inset 0 1.5px 1px rgba(255,255,255,.6)}
-.hero h1{letter-spacing:-.5px}.bar i{background:var(--fg)}
-.id{border-radius:26px}.id .hd{opacity:.95}
-.mq{border-radius:18px;border-inline:1px solid var(--bd)}
-.rw{border-bottom-color:color-mix(in srgb,var(--bd) 70%,transparent)}
-/* overlays + modals */
-.ov{background:rgba(12,14,30,.42);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.md{border-radius:28px;background:color-mix(in srgb,var(--bg) 62%,transparent);-webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%)}
-/* video player */
-.vp{background:var(--bg)}.vp:before{content:"";position:fixed;inset:0;z-index:-1;opacity:var(--blob);background:radial-gradient(circle at 15% 20%,#7b5cff,transparent 40%),radial-gradient(circle at 85% 70%,#19b4ff,transparent 40%)}
-.vp .vh{background:var(--card);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%)}
-.vp .vs{box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.18)}
-.vp .vi.on{background:color-mix(in srgb,var(--a) 18%,transparent);color:var(--a)}
-@supports not (backdrop-filter:blur(1px)){:root{--card:rgba(245,247,255,.92)}:root[data-theme="dark"]{--card:rgba(24,27,40,.92)}}
+.nb,.b,.bt{position:relative;overflow:hidden;background:var(--a);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:12px;box-shadow:0 6px 16px rgba(36,59,90,.25),inset 0 1.5px 1px rgba(255,255,255,.3),inset 0 -2px 4px rgba(0,0,0,.12);transition:transform .2s}
+:root[data-theme="dark"] .nb,:root[data-theme="dark"] .b,:root[data-theme="dark"] .bt{color:#12161c;box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 1.5px 1px rgba(255,255,255,.35)}
+.nb:before,.b:before,.bt:before{content:"";position:absolute;inset:0 0 50%;background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,0));pointer-events:none}
+.bt{border-radius:99px}.nb:active,.b:active,.bt:active{transform:scale(.97)}
+.b.s,.bt.s{background:var(--card);color:var(--fg);border:1px solid var(--bd);box-shadow:var(--glass-sh);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}.b.s:before,.bt.s:before{display:none}
+.bt.r{background:rgba(163,58,58,.12);color:#a33a3a;box-shadow:none;border-color:rgba(163,58,58,.25)}.bt.r:before{display:none}
+.c{border-radius:99px}.c.on{background:var(--a);color:#fff;border-color:rgba(255,255,255,.25);box-shadow:inset 0 1px 1px rgba(255,255,255,.3)}
+:root[data-theme="dark"] .c.on,:root[data-theme="dark"] .bub.me{color:#12161c}
+.bub.me{background:var(--a);color:#fff;border-color:rgba(255,255,255,.2)}
+.lg,.mono{background:var(--a);color:#fff;box-shadow:0 6px 16px rgba(36,59,90,.25),inset 0 1.5px 1px rgba(255,255,255,.35)}
+:root[data-theme="dark"] .lg,:root[data-theme="dark"] .mono{color:#12161c}
+.id .hd{background:linear-gradient(135deg,var(--a),var(--a2))}.id .av{color:var(--a)}.id{border-radius:24px}
+.dock{border-radius:28px;padding:7px;gap:2px}
+.dock button,.dock a{border-radius:20px;transition:.25s}
+.dock .on{color:var(--fg);background:rgba(255,255,255,.4);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.85),0 3px 10px rgba(0,0,0,.1)}
+:root[data-theme="dark"] .dock .on{background:rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.28),0 3px 10px rgba(0,0,0,.35)}
+.pr{color:var(--a)}.cvi{border-radius:14px}
+.mq{border-radius:16px;border:1px solid var(--bd);background:var(--card);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.ov{background:rgba(15,18,24,.45);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.md{background:color-mix(in srgb,var(--bg) 65%,transparent);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);border-radius:24px}
+.vp{background:var(--bg)}.vp .vh{background:var(--card);border-bottom:1px solid var(--bd);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.vp .vs{border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.15)}
+.vp .vc button,.vp .vc select{border-radius:12px}.vp .pg div{background:var(--a)}
+.vp .vi.on{background:color-mix(in srgb,var(--a) 14%,transparent);color:var(--a)}.vp .vi.dn i{background:#4f7a5a;border-color:#4f7a5a}
+.vp .vblk{position:absolute;top:0;left:0;right:0;height:18%;z-index:2}
+@supports not (backdrop-filter:blur(1px)){:root{--card:rgba(250,248,243,.94)}:root[data-theme="dark"]{--card:rgba(26,30,38,.94)}}
 </style></head><body>
 <header><div class="brand"><span class="lg" id="logo"></span><span>Not <span class="g">Programming</span><small id="tag"></small></span></div>
 <div class="tools"><select class="tb" id="lg" onchange="setLang(this.value)"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option></select>
@@ -614,7 +610,7 @@ render();
 </script>
 <script>
 /* ===== مشغّل الفيديوهات (YouTube + mp4) ===== */
-const VT={ar:{prev:'السابق',next:'التالي',sp:'السرعة',list:'قائمة الدروس',yt:'فتح في يوتيوب',done:'تمت المشاهدة'},en:{prev:'Previous',next:'Next',sp:'Speed',list:'Lessons',yt:'Open on YouTube',done:'Watched'},fr:{prev:'Préc.',next:'Suivant',sp:'Vitesse',list:'Leçons',yt:'Ouvrir sur YouTube',done:'Vu'}};
+const VT={ar:{prev:'السابق',next:'التالي',sp:'السرعة',list:'قائمة الدروس',fs:'ملء الشاشة',done:'تمت المشاهدة'},en:{prev:'Previous',next:'Next',sp:'Speed',list:'Lessons',fs:'Fullscreen',done:'Watched'},fr:{prev:'Préc.',next:'Suivant',sp:'Vitesse',list:'Leçons',fs:'Plein écran',done:'Vu'}};
 const vt=k=>(VT[lg]||VT.ar)[k];
 const vKey=id=>'npv:'+((me&&me.email)||'')+':'+id;
 const vGet=id=>{try{return JSON.parse(localStorage.getItem(vKey(id)))||{}}catch(e){return{}}};
@@ -627,15 +623,16 @@ function ytApi(){return new Promise(r=>{if(window.YT&&YT.Player)return r();const
 function playV(cid,iid){const c=db.courses.find(x=>x.id===cid);if(!c)return;vMount();VP.cid=cid;VP.list=(c.items||[]).filter(i=>i.type==='video');VP.iid=iid;document.getElementById('vp').classList.add('on');document.body.style.overflow='hidden';vDraw();vLoad()}
 function vCur(){return VP.list.find(i=>i.id===VP.iid)}
 function vDraw(){const it=vCur();if(!it)return;const i=VP.list.indexOf(it);
-document.getElementById('vp').innerHTML=`<div class="vh"><button class="c" onclick="vClose()">✕</button><b>${esc(it.title)}</b></div><div class="vb"><div><div class="vs" id="vs"><div class="wm" id="wm">${esc((me&&me.email)||'')}</div><div id="vy"></div></div><div class="pg"><div id="vpg"></div></div>
+document.getElementById('vp').innerHTML=`<div class="vh"><button class="c" onclick="vClose()">✕</button><b>${esc(it.title)}</b></div><div class="vb"><div><div class="vs" id="vs"><div class="vblk"></div><div class="wm" id="wm">${esc((me&&me.email)||'')}</div><div id="vy"></div></div><div class="pg"><div id="vpg"></div></div>
 <div class="vc"><button onclick="vGo(-1)" ${i<=0?'disabled':''}>${vt('prev')}</button><select id="vsp" onchange="vSpeed(this.value)" aria-label="${vt('sp')}">${[.75,1,1.25,1.5,2].map(s=>`<option value="${s}" ${s==(+localStorage.getItem('npv_sp')||1)?'selected':''}>${s}x</option>`).join('')}</select><button onclick="vGo(1)" ${i>=VP.list.length-1?'disabled':''}>${vt('next')}</button></div>
-<div class="vc"><button onclick="window.open('${esc(it.url)}','_blank','noopener')">${vt('yt')}</button></div></div>
+<div class="vc"><button onclick="vFull()">⛶ ${vt('fs')}</button></div></div>
 <div><h4 style="margin:0 0 8px">${vt('list')} (${VP.list.length})</h4><div class="vl">${VP.list.map((x,n)=>`<div class="vi ${x.id===VP.iid?'on':''} ${vDone(x.id)?'dn':''}" onclick="VP.iid='${x.id}';vDraw();vLoad()"><i>${vDone(x.id)?'✓':n+1}</i><span>${esc(x.title)}</span></div>`).join('')}</div></div></div>`}
 async function vLoad(){clearInterval(VP.timer);if(VP.yt&&VP.yt.destroy){try{VP.yt.destroy()}catch(e){}}VP.yt=null;
 const it=vCur(),host=document.getElementById('vy');if(!it||!host)return;const id=ytId(it.url),sp=+localStorage.getItem('npv_sp')||1,st=vGet(it.id);
-if(id){await ytApi();if(!document.getElementById('vy'))return;VP.yt=new YT.Player('vy',{videoId:id,playerVars:{rel:0,modestbranding:1,playsinline:1,start:st.t&&!st.done?Math.floor(st.t):0},events:{onReady:e=>{e.target.setPlaybackRate(sp)},onStateChange:e=>{if(e.data===0){vSet(it.id,{done:1,t:0});vGo(1,true)}}}});
+if(id){await ytApi();if(!document.getElementById('vy'))return;VP.yt=new YT.Player('vy',{host:'https://www.youtube-nocookie.com',videoId:id,playerVars:{rel:0,modestbranding:1,playsinline:1,fs:0,iv_load_policy:3,start:st.t&&!st.done?Math.floor(st.t):0},events:{onReady:e=>{e.target.setPlaybackRate(sp)},onStateChange:e=>{if(e.data===0){vSet(it.id,{done:1,t:0});vGo(1,true)}}}});
 VP.timer=setInterval(()=>{try{const p=VP.yt,t=p.getCurrentTime(),d=p.getDuration();if(!d)return;document.getElementById('vpg').style.width=(t/d*100)+'%';if(p.getPlayerState()===1){vSet(it.id,{t});if(t/d>.9&&!vDone(it.id)){vSet(it.id,{done:1});const r=document.querySelectorAll('.vp .vi')[VP.list.indexOf(it)];r&&r.classList.add('dn')}}const w=document.getElementById('wm');if(w){w.style.top=(8+Math.random()*75)+'%';w.style.insetInlineStart=(5+Math.random()*60)+'%'}}catch(e){}},4000)}
 else{host.outerHTML=`<video id="vy" src="${esc(it.url)}" controls playsinline controlsList="nodownload" style="position:absolute;inset:0;width:100%;height:100%"></video>`;const v=document.getElementById('vy');v.playbackRate=sp;v.currentTime=st.t||0;v.ontimeupdate=()=>{vSet(it.id,{t:v.currentTime});document.getElementById('vpg').style.width=(v.currentTime/v.duration*100)+'%'};v.onended=()=>{vSet(it.id,{done:1,t:0});vGo(1,true)}}}
+function vFull(){try{const e=document.getElementById('vs');(e.requestFullscreen||e.webkitRequestFullscreen).call(e)}catch(x){}}
 function vSpeed(s){localStorage.setItem('npv_sp',s);try{VP.yt&&VP.yt.setPlaybackRate(+s)}catch(e){}const v=document.querySelector('video#vy');if(v)v.playbackRate=+s}
 function vGo(d,auto){const i=VP.list.indexOf(vCur())+d;if(i<0||i>=VP.list.length){if(auto)vDraw();return}VP.iid=VP.list[i].id;vDraw();vLoad()}
 function vClose(){clearInterval(VP.timer);try{VP.yt&&VP.yt.destroy()}catch(e){}VP.yt=null;const p=document.getElementById('vp');p.classList.remove('on');p.innerHTML='';document.body.style.overflow='';if(typeof render==='function')render()}
