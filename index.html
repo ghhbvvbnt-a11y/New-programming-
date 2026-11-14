@@ -186,6 +186,7 @@ out:'<path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/>',
 arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
 play:'<path d="M8 5.5v13l11-6.5z"/>',
 clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M8.5 20h7M9.5 17h5"/>',
 code:'<path d="M9 4C6.5 4 7.5 9 5 12c2.5 3 1.5 8 4 8M15 4c2.5 0 1.5 5 4 8-2.5 3-1.5 8-4 8"/>'};
 const I=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
 /* extra translations added on top of the base dictionary */
@@ -303,7 +304,7 @@ let me=null,cur=null,sec='home',mode='login',fg='all',ft='all',pz=null,pmth='vc'
 const th0=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=th0;
 function toggleTheme(){const d=document.documentElement;d.dataset.theme=d.dataset.theme==='dark'?'light':'dark'}
 const isT=()=>me&&me.role==='teacher';
-const NAV=()=>[['home','home','home'],['courses','book','cs'],['ai','spark','ai'],...(isT()?[['dash','sliders','dash']]:[['mentor','chat','buddy'],['profile','id','pf']])];
+const NAV=()=>[['home','home','home'],['courses','book','cs'],['top','trophy','top'],['ai','spark','ai'],...(isT()?[['dash','sliders','dash']]:[['mentor','chat','buddy'],['profile','id','pf']])];
 let dt='pay',editing=false,aih=[],busy=false,abusy=false,unsubs=[],itype='video',examBuilder=[],examState=null,examAns=[],expandedGrade=null,grFilterEmail='',icSel='',itemDraft={title:'',url:''},eqDraft=blankEQ(),cDraft=blankCDraft(),grantSel={},dErr='',dOk='';
 function blankEQ(){return{q:'',c:['','','',''],cr:0}}
 function blankCDraft(){return{ct:'',cd:'',cg:0,ctr:(TR[0]&&TR[0][0])||'',cp:'',cf:null}}
@@ -317,7 +318,7 @@ function render(){
  if(!me){$('#m').innerHTML=vAuth();return}
  const pc=isT()?pend():0;
  $('#dk').innerHTML=NAV().map(([k,i,l])=>`<button class="${sec===k||(k==='courses'&&(sec==='course'||sec==='exam'))?'on':''}" onclick="go('${k}')">${I(i,20)}<em>${t(l)}</em>${k==='dash'&&pc?`<b class="nt">${pc}</b>`:''}</button>`).join('')+`<button onclick="openSup()">${I('life',20)}<em>${t('help')}</em></button>`;
- $('#m').innerHTML=({home:vHome,courses:vCourses,course:vCourse,exam:vExam,ai:vAI,mentor:vMentor,profile:vProf,dash:vDash}[sec]||vHome)();
+ $('#m').innerHTML=({home:vHome,top:vTop,courses:vCourses,course:vCourse,exam:vExam,ai:vAI,mentor:vMentor,profile:vProf,dash:vDash}[sec]||vHome)();
  const b=$('.chat');if(b)b.scrollTop=b.scrollHeight}
 
 /* ---------------- auth ---------------- */
@@ -614,7 +615,8 @@ const VT={ar:{prev:'السابق',next:'التالي',sp:'السرعة',list:'ق
 const vt=k=>(VT[lg]||VT.ar)[k];
 const vKey=id=>'npv:'+((me&&me.email)||'')+':'+id;
 const vGet=id=>{try{return JSON.parse(localStorage.getItem(vKey(id)))||{}}catch(e){return{}}};
-const vSet=(id,o)=>{try{localStorage.setItem(vKey(id),JSON.stringify({...vGet(id),...o}))}catch(e){}};
+const vSet=(id,o)=>{try{localStorage.setItem(vKey(id),JSON.stringify({...vGet(id),...o}))}catch(e){}if(o&&o.done)vSync(id)};
+function vSync(id){if(!me||me.role!=='student')return;try{sb.from('watch_progress').upsert({uid:me.uid,item_id:id,cid:VP.cid},{onConflict:'uid,item_id',ignoreDuplicates:true}).then(()=>{},()=>{})}catch(e){}}
 function vDone(id){return !!vGet(id).done}
 function ytId(u){u=String(u||'');const m=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([\w-]{11})/);return m?m[1]:/^[\w-]{11}$/.test(u)?u:''}
 let VP={cid:null,iid:null,yt:null,timer:null,list:[]};
@@ -625,9 +627,9 @@ function vCur(){return VP.list.find(i=>i.id===VP.iid)}
 function vDraw(){const it=vCur();if(!it)return;const i=VP.list.indexOf(it);
 document.getElementById('vp').innerHTML=`<div class="vh"><button class="c" onclick="vClose()">✕</button><b>${esc(it.title)}</b></div><div class="vb"><div><div class="vs" id="vs"><div class="vblk"></div><div class="wm" id="wm">${esc((me&&me.email)||'')}</div><div id="vy"></div></div><div class="pg"><div id="vpg"></div></div>
 <div class="vc"><button onclick="vGo(-1)" ${i<=0?'disabled':''}>${vt('prev')}</button><select id="vsp" onchange="vSpeed(this.value)" aria-label="${vt('sp')}">${[.75,1,1.25,1.5,2].map(s=>`<option value="${s}" ${s==(+localStorage.getItem('npv_sp')||1)?'selected':''}>${s}x</option>`).join('')}</select><button onclick="vGo(1)" ${i>=VP.list.length-1?'disabled':''}>${vt('next')}</button></div>
-<div class="vc"><button onclick="vFull()">⛶ ${vt('fs')}</button></div></div>
+<div class="vc"><button onclick="vFull()">⛶ ${vt('fs')}</button></div><div class="bx" id="vcm" style="margin-top:14px"></div></div>
 <div><h4 style="margin:0 0 8px">${vt('list')} (${VP.list.length})</h4><div class="vl">${VP.list.map((x,n)=>`<div class="vi ${x.id===VP.iid?'on':''} ${vDone(x.id)?'dn':''}" onclick="VP.iid='${x.id}';vDraw();vLoad()"><i>${vDone(x.id)?'✓':n+1}</i><span>${esc(x.title)}</span></div>`).join('')}</div></div></div>`}
-async function vLoad(){clearInterval(VP.timer);if(VP.yt&&VP.yt.destroy){try{VP.yt.destroy()}catch(e){}}VP.yt=null;
+async function vLoad(){cmLoad();clearInterval(VP.timer);if(VP.yt&&VP.yt.destroy){try{VP.yt.destroy()}catch(e){}}VP.yt=null;
 const it=vCur(),host=document.getElementById('vy');if(!it||!host)return;const id=ytId(it.url),sp=+localStorage.getItem('npv_sp')||1,st=vGet(it.id);
 if(id){await ytApi();if(!document.getElementById('vy'))return;VP.yt=new YT.Player('vy',{host:'https://www.youtube-nocookie.com',videoId:id,playerVars:{rel:0,modestbranding:1,playsinline:1,fs:0,iv_load_policy:3,start:st.t&&!st.done?Math.floor(st.t):0},events:{onReady:e=>{e.target.setPlaybackRate(sp)},onStateChange:e=>{if(e.data===0){vSet(it.id,{done:1,t:0});vGo(1,true)}}}});
 VP.timer=setInterval(()=>{try{const p=VP.yt,t=p.getCurrentTime(),d=p.getDuration();if(!d)return;document.getElementById('vpg').style.width=(t/d*100)+'%';if(p.getPlayerState()===1){vSet(it.id,{t});if(t/d>.9&&!vDone(it.id)){vSet(it.id,{done:1});const r=document.querySelectorAll('.vp .vi')[VP.list.indexOf(it)];r&&r.classList.add('dn')}}const w=document.getElementById('wm');if(w){w.style.top=(8+Math.random()*75)+'%';w.style.insetInlineStart=(5+Math.random()*60)+'%'}}catch(e){}},4000)}
@@ -649,5 +651,28 @@ if(!ph)return alert(lg==='en'?'No parent phone for this student':'مفيش رق�
 window.open(ch==='wa'?`https://wa.me/${ph}?text=${x}`:`sms:+${ph}?body=${x}`,'_blank')}
 async function autoNotify(id){try{if(!db.ai)return;const s=(await sb.auth.getSession()).data.session;if(!s)return;
 fetch(db.ai.replace(/\/$/,'')+'/notify',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+s.access_token},body:JSON.stringify({id})}).catch(()=>{})}catch(e){}}
+</script>
+
+<script>
+/* ===== تعليقات المحاضرات + أوائل المنصة ===== */
+Object.assign(L.ar,{top:'أوائل المنصة'});Object.assign(L.en,{top:'Top students'});Object.assign(L.fr,{top:'Meilleurs élèves'});
+const CT={ar:{cm:'التعليقات',ph:'اكتب تعليقك أو سؤالك عن المحاضرة...',send:'إرسال',none:'مفيش تعليقات لسه. كن أول واحد!',del:'حذف',pts:'نقطة',vd:'محاضرة',ex:'امتحان',how:'النقاط: 10 لكل محاضرة تخلّصها + من 20 لـ 50 لكل امتحان حسب درجتك',empty:'لسه مفيش أوائل في الصف ده. ابدأ شاهد وحل امتحانات!',you:'ترتيبك'},
+en:{cm:'Comments',ph:'Write a comment or question...',send:'Send',none:'No comments yet. Be the first!',del:'Delete',pts:'pts',vd:'lectures',ex:'exams',how:'Points: 10 per finished lecture + 20–50 per exam by score',empty:'No leaders in this grade yet.',you:'You'},
+fr:{cm:'Commentaires',ph:'Écrivez un commentaire...',send:'Envoyer',none:'Aucun commentaire.',del:'Supprimer',pts:'pts',vd:'cours',ex:'examens',how:'Points : 10 par cours terminé + 20–50 par examen',empty:'Aucun classement pour ce niveau.',you:'Vous'}};
+const ct=k=>(CT[lg]||CT.ar)[k];
+async function cmLoad(){const el=document.getElementById('vcm'),it=vCur();if(!el||!it)return;el.innerHTML=`<h4 style="margin:0 0 10px">${ct('cm')}</h4><div id="cml"></div><div class="rowin" style="margin-top:10px"><textarea id="cmt" maxlength="500" rows="2" placeholder="${ct('ph')}"></textarea><button class="b" style="width:auto;padding:0 16px" onclick="cmSend()">${ct('send')}</button></div>`;
+try{const {data,error}=await sb.from('lecture_comments').select('id,uid,name,body,ts').eq('item_id',it.id).order('ts',{ascending:false}).limit(50);if(error)throw error;
+if(!document.getElementById('cml')||vCur()!==it)return;document.getElementById('cml').innerHTML=data.length?data.map(c=>`<div class="rw" style="align-items:flex-start"><div style="flex:1;min-width:0"><b style="font-size:13px">${esc(c.name||'')}</b> <small style="color:var(--mut)">${fd(Number(c.ts))}</small><div style="font-size:14px;line-height:1.7;word-break:break-word">${esc(c.body)}</div></div>${(isT()||c.uid===me.uid)?`<button class="c" onclick="cmDel('${c.id}')">${ct('del')}</button>`:''}</div>`).join(''):`<p style="color:var(--mut);font-size:13px">${ct('none')}</p>`}catch(e){const l=document.getElementById('cml');if(l)l.innerHTML=`<small style="color:#a33a3a">${esc(e.message||'')}</small>`}}
+async function cmSend(){const it=vCur(),ta=document.getElementById('cmt'),v=ta&&cl(ta.value);if(!v||!it)return;ta.disabled=true;
+const {error}=await sb.from('lecture_comments').insert({item_id:it.id,body:v.slice(0,500)});ta.disabled=false;if(error){alert(error.message);return}cmLoad()}
+async function cmDel(id){if(!confirm('?'))return;await sb.from('lecture_comments').delete().eq('id',id);cmLoad()}
+let TOP={g:null,rows:null,err:'',busy:false},topG=null;
+async function loadTop(g){if(TOP.busy)return;TOP.busy=true;try{const {data,error}=await sb.rpc('top_students',{p_grade:g});TOP.rows=error?[]:data;TOP.err=error?error.message:''}catch(e){TOP.rows=[];TOP.err=e.message||''}TOP.g=g;TOP.busy=false;render()}
+function vTop(){if(topG===null)topG=me&&me.role==='student'?Number(me.g)||0:0;
+if(TOP.g!==topG&&!TOP.busy){TOP.rows=null;loadTop(topG)}
+const chips=[0,1,2].map(g=>`<button class="c ${topG===g?'on':''}" onclick="topG=${g};TOP.g=null;render()">${t('g'+g)}</button>`).join('');
+const m=['🥇','🥈','🥉'];
+const body=TOP.rows===null||TOP.g!==topG?`<p style="text-align:center;color:var(--mut)">${t('loading')}</p>`:TOP.err?`<p style="color:#a33a3a;font-size:13px">${esc(TOP.err)}</p>`:TOP.rows.length?TOP.rows.map(r=>`<div class="rw" style="${r.is_me?'font-weight:700;background:color-mix(in srgb,var(--a) 10%,transparent);border-radius:12px;padding-inline:10px':''}"><span style="display:flex;gap:10px;align-items:center"><b style="min-width:30px;text-align:center;font-size:${r.rank<=3?20:14}px">${m[r.rank-1]||r.rank}</b>${esc(r.name)}${r.is_me?` <small>(${ct('you')})</small>`:''}</span><span style="text-align:end"><b>${r.points}</b> ${ct('pts')}<br><small style="color:var(--mut)">${r.videos} ${ct('vd')} · ${r.exams} ${ct('ex')}</small></span></div>`).join(''):`<p style="text-align:center;color:var(--mut)">${ct('empty')}</p>`;
+return `<h3 class="sec" style="margin-top:10px">🏆 ${t('top')}</h3><div class="ch" style="justify-content:center">${chips}</div><div class="bx">${body}</div><p style="text-align:center;color:var(--mut);font-size:12px">${ct('how')}</p>`}
 </script>
 </body></html>
